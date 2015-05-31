@@ -29,6 +29,20 @@ matplotlib.rcParams['text.usetex'] = True
 # import matplotlib
 # matplotlib.rcParams.update(params)
 ##########################################################
+#Thesis:
+from matplotlib import rc
+matplotlib.rc('font',**{'family':'serif','serif':['Times'],'size':10})
+
+GOLDEN = (1.0+np.sqrt(5.0))/2.0
+
+paperWidth  = 17.0-(2.2+2.0) #cm
+paperHeigth = paperWidth/GOLDEN
+
+FIGSIZE = (paperWidth*0.393700787,(paperHeigth-2.0)*0.393700787);
+scaleFig = 1
+FIGSIZE = map(lambda x: x*scaleFig, FIGSIZE)
+print "FIGSIZE =", FIGSIZE
+DPI = 300
 ##########################################################
 
 import WakefieldReader as WR
@@ -262,7 +276,7 @@ if runMode == "LONG":
             #print "Q_total = %g [C], %s" % (sciInt.simps(wl.I, x=wl.s), wl.plotLab)
 
     #Plotting
-    plt.figure(1)
+    plt.figure(1,figsize=FIGSIZE,dpi=DPI)
     for d in data:
         for wl in d.wakefieldsLongitudinal:
             plt.plot(wl.s,wl.W, label=wl.plotLab)
@@ -274,9 +288,9 @@ if runMode == "LONG":
         plt.ylabel("$W_z$ [V/pC/m]")
     else:
         plt.ylabel("$W_z$ [V/pC]")
-    plt.savefig("wakeplot_Wz-vs-S.png")
+#    plt.savefig("wakeplot_Wz-vs-S.png")
 
-    plt.figure(2)
+    plt.figure(2,figsize=FIGSIZE,dpi=DPI)
     for d in data:
         for wl in d.wakefieldsLongitudinal:
             plt.plot(wl.s,wl.I,label=wl.plotLab)
@@ -284,12 +298,12 @@ if runMode == "LONG":
     plt.legend(loc=0)
     plt.xlabel("s [m]")
     plt.ylabel("Bunch current [C/m]")
-    plt.savefig("wakeplot_I-vs-S.png")
+#    plt.savefig("wakeplot_I-vs-S.png")
     # analytic_I = 1e-12*np.exp(-(wl.s-2.5e-3*5)**2/(2*2.5e-3**2))/(2.5e-3*np.sqrt(2*np.pi))
     # print "Analytic Qtot = ", sciInt.simps(analytic_I,x=wl.s)
     # print "Analytic \int |I|^2 dx =", sciInt.simps(analytic_I**2,x=wl.s)
 
-    plt.figure(3)
+    plt.figure(3,figsize=FIGSIZE,dpi=DPI)
     for d in data:
         for wl in d.wakefieldsLongitudinal:
             plt.plot(wl.s,np.abs(sciSig.hilbert(wl.W)), label=wl.plotLab)
@@ -300,9 +314,9 @@ if runMode == "LONG":
         plt.ylabel("$|\text{hilbert}|(W_z)$ [V/pC/m]")
     else:
         plt.ylabel("$|\text{hilbert}|(W_z)$ [V/pC]")
-    plt.savefig("wakeplot_envWz-vs-S.png")
+#    plt.savefig("wakeplot_envWz-vs-S.png")
 
-    plt.figure(4)
+    plt.figure(4,figsize=FIGSIZE,dpi=DPI)
     for d in data:
         for wl in d.wakefieldsLongitudinal:
             #plt.loglog(wl.f[0:wl.safeLen], np.abs(wl.W_FFT[0:wl.safeLen]),label=wl.plotLab)
@@ -334,9 +348,9 @@ if runMode == "LONG":
         plt.ylabel("$|Z_z|$ [Ohm/m]")
     else:
         plt.ylabel("$|Z_z|$ [Ohm]")
-    plt.savefig("wakeplot_Z-vs-F_log.png")
+#    plt.savefig("wakeplot_Z-vs-F_log.png")
 
-    # plt.figure(5)
+    # plt.figure(5,figsize=FIGSIZE,dpi=DPI)
     # for d in data:
     #     for wl in d.wakefieldsLongitudinal:
     #         #plt.loglog(wl.f[0:wl.safeLen], abs(wl.I_FFT[0:wl.safeLen]),label=wl.plotLab)
@@ -439,17 +453,17 @@ elif runMode == "TRANS":
             minS = s[0];
 
         #RAW DATA
-        plt.figure(1)
+        plt.figure(1,figsize=FIGSIZE,dpi=DPI)
         wxline = plt.plot(s, wl[0].W, label=plotLabel)
         wxcolor = wxline[0].get_color() #Used when plotting more than one line pr data,
                                         # to get same color scheme everywhere
         
         #SIGNAL
-        plt.figure(2)
+        plt.figure(2,figsize=FIGSIZE,dpi=DPI)
         plt.plot(s, W_x, label=plotLabel)
         
         #ENVELOPE (peak jumper)
-        # plt.figure(8)
+        # plt.figure(8,figsize=FIGSIZE,dpi=DPI)
         # sPeaks = []
         # wPeaks = []
         # wAbs = np.abs(W_x)
@@ -460,7 +474,7 @@ elif runMode == "TRANS":
         # plt.semilogy(sPeaks,wPeaks,label=plotLabel)
 
         #Envelope (double peak jumper, difference between peaks)
-        plt.figure(9)
+        plt.figure(9,figsize=FIGSIZE,dpi=DPI)
         sPeaks_up = []
         wPeaks_up = []
         sPeaks_dn = []
@@ -477,14 +491,14 @@ elif runMode == "TRANS":
         plt.semilogy(s,wEnvelope,label=plotLabel)
         
         #Test plot for double peak jumper
-        # plt.figure(10)
+        # plt.figure(10,figsize=FIGSIZE,dpi=DPI)
         # plt.plot(s,W_x)
         # plt.plot(s,np.interp(s, sPeaks_up, wPeaks_up))
         # plt.plot(s,np.interp(s, sPeaks_dn, wPeaks_dn))
         
 
         #ENVELOPE
-        plt.figure(3)
+        plt.figure(3,figsize=FIGSIZE,dpi=DPI)
         def smoothListGaussian(list,strippedXs=False,degree=200):
             #Function borrowed from
             #http://www.swharden.com/blog/2008-11-17-linear-data-smoothing-in-python/
@@ -523,11 +537,11 @@ elif runMode == "TRANS":
         print "\t wake value =", wakeEnvelope[idxSfirstBunch]#, \
         #      "\n\t smoothed wake value =", smoothed[idxSfirstBunch], "[V/pC(/m/mm)]"
 
-        # plt.figure(4)
+        # plt.figure(4,figsize=FIGSIZE,dpi=DPI)
         # plt.semilogy(s, np.abs(W_x), label=plotLabel)
 
         #IMPEDANCE
-        plt.figure(5)
+        plt.figure(5,figsize=FIGSIZE,dpi=DPI)
         # 0. Make FFT of Wx signal
         t = s/3e8
         dt = t[1]-t[0] #Assume uniform s/t-step
@@ -563,7 +577,7 @@ elif runMode == "TRANS":
         ZplotLineColor = ZplotLine[0].get_color()
         
         # (real and complex)
-        plt.figure(10)
+        plt.figure(10,figsize=FIGSIZE,dpi=DPI)
         if plotLabel == "":
             plt.plot(f[:cutLen]/1e9,np.real(Z[:cutLen]), label="Real", ls="-")
             plt.plot(f[:cutLen]/1e9,np.imag(Z[:cutLen]), label="Imag", ls="--")
@@ -575,7 +589,7 @@ elif runMode == "TRANS":
 
         # Try to fit the Q/f0/amplitude
         print "FITTING Z PEAK of '" + plotLabel + "'"
-        plt.figure(6)
+        plt.figure(6,figsize=FIGSIZE,dpi=DPI)
         
         ks =  np.fft.fftfreq(s.size, d=s[1]-s[0])
         fitfunc = lambda p,k : p[2] * np.sqrt( (p[0]**2 * (4*p[1]**2-1)) / \
@@ -655,11 +669,11 @@ elif runMode == "TRANS":
         plt.xlabel("ks [1/m]")
         plt.ylabel("$Z_k$ [Vm / pC/m/mm]")
         #plt.subplots_adjust(left=0.15, right=0.96, bottom=0.19, top=0.97)
-        plt.savefig("ImpedanceFitting.pdf", transparent=True)
+#        plt.savefig("ImpedanceFitting.pdf", transparent=True)
         print "END FITTING Z PEAK"
         
         # #Bunch
-        # plt.figure(20)
+        # plt.figure(20,figsize=FIGSIZE,dpi=DPI)
         # plt.plot(s,d.wakefieldsLongitudinal[0].I)
         # Icalculated = np.exp(-s**2/(2*(2e-3)**2))/(2e-3 * np.sqrt(2*np.pi))
         # plt.plot(s,Icalculated,'r--')
@@ -675,7 +689,7 @@ elif runMode == "TRANS":
         # calcIFFT2 *= np.abs(I_FFT[0])/calcIFFT2[0]
 
         
-        # plt.figure(21)
+        # plt.figure(21,figsize=FIGSIZE,dpi=DPI)
         # plt.plot(ks[:safeLen], np.abs(I_FFT[:safeLen]))
         # plt.plot(ks[:safeLen], calcIFFT[:safeLen], 'r--')
         # plt.plot(ks[:safeLen], calcIFFT2[:safeLen], 'k-')
@@ -684,20 +698,20 @@ elif runMode == "TRANS":
         # plt.xlabel("ks [1/m]")
         # plt.ylabel("I_FFT")
         
-        # plt.figure(22)
+        # plt.figure(22,figsize=FIGSIZE,dpi=DPI)
         # plt.plot(ks[:safeLen], np.real(I_FFT[:safeLen]), label="Real")
         # plt.plot(ks[:safeLen], np.imag(I_FFT[:safeLen]), label="Imag")
         # plt.legend()
         # plt.xlabel("ks [1/m]")
         # plt.ylabel("I_FFT")
 
-        # plt.figure(23)
+        # plt.figure(23,figsize=FIGSIZE,dpi=DPI)
         # plt.plot(ks,f)
-        # plt.figure(24)
+        # plt.figure(24,figsize=FIGSIZE,dpi=DPI)
         # plt.plot(f/ks)
 
         #NOMINAL WAKE
-        plt.figure(7)
+        plt.figure(7,figsize=FIGSIZE,dpi=DPI)
         W_nom = np.fft.irfft(3e8*Z[:cutLen]*I_FFT[0], len(s))
         print "Using dirac driving pulse with I_FFT[0] =", I_FFT[0]
         plt.plot(s+d.offset_s,W_nom, label=plotLabel+"-reconstructed", color=wxcolor,ls='--')
@@ -715,7 +729,7 @@ elif runMode == "TRANS":
         
     ## End loop over datafiles
     
-    plt.figure(1)
+    plt.figure(1,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         if minS > gdfidl.Wx_s[0]:
             minS = gdfidl.Wx_s[0]
@@ -727,8 +741,14 @@ elif runMode == "TRANS":
     plt.legend(loc=0)
     (got_smin,got_smax) = plt.xlim()
     plt.xlim(minS,got_smax)
+    plt.subplots_adjust(left=0.15,bottom=0.15,right=0.98,top=0.97)
+#    plt.savefig("wakeplot_Vz.png")
+    plt.savefig("wakeplot_Vz.pdf")
+    plt.xlim(minS,0.5)
+#    plt.savefig("wakeplot_Vz_zoom.png")
+    plt.savefig("wakeplot_Vz_zoom.pdf")
 
-    plt.figure(2)
+    plt.figure(2,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         gdfidlWakeLine = plt.plot(gdfidl.Wx_s, gdfidl.Wx, 'k', label="GdfidL")
         gdfidlColor = gdfidlWakeLine[0].get_color()
@@ -741,9 +761,15 @@ elif runMode == "TRANS":
     plt.ylabel("$V_x$ [" + unitString + "]")
     plt.legend(loc=0)
     plt.xlim(minS,got_smax)
-    plt.savefig("wakeplot_Wx-vs-S.png")
+    plt.subplots_adjust(left=0.15,bottom=0.15,right=0.98,top=0.98)
+#    plt.savefig("wakeplot_Vx.png")
+    plt.savefig("wakeplot_Vx.pdf")
+    plt.xlim(minS,0.5)
+#    plt.savefig("wakeplot_Wx_zoom.png")
+    plt.savefig("wakeplot_Vx_zoom.pdf")
+
     
-    plt.figure(3)
+    plt.figure(3,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         iclFac=1.0
         plt.semilogy(gdfidl.Wx_s[:int(len(gdfidl.Wx_s)*iclFac)], np.abs(sciSig.hilbert(gdfidl.Wx))[:int(len(gdfidl.Wx_s)*iclFac)], label="GdfidL", color=gdfidlColor)
@@ -751,9 +777,9 @@ elif runMode == "TRANS":
     plt.ylabel("$|\mathrm{hilbert}(V_x)|$ [" + unitString + "]")
     plt.legend(loc=0)
     plt.xlim(minS,got_smax)
-    plt.savefig("wakeplot_envHilbertWx-vs-S.png")
+#    plt.savefig("wakeplot_envHilbertWx-vs-S.png")
 
-    # plt.figure(4)
+    # plt.figure(4,figsize=FIGSIZE,dpi=DPI)
     # if gdfidl:
     #     plt.semilogy(gdfidl.Wx_s, np.abs(gdfidl.Wx), label="GdfidL")
     # plt.xlabel("s [m]")
@@ -762,20 +788,23 @@ elif runMode == "TRANS":
     # plt.xlim(minS,got_smax)
     # plt.savefig("wakeplot_envAbsWx-vs-S.png")
     
-    plt.figure(5)
+    plt.figure(5,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         plt.plot(gdfidl.ZxF/1e9, np.abs(gdfidl.Zx), label="GdfidL", color=gdfidlColor)
-    unitString = "\Omega"
+    unitString = "\Omega\mathrm{"
     if lenNormalized:
         unitString += "/m"
     if offsetNormalized:
         unitString += "/mm"
+    unitString += "}"
     plt.xlabel("f [GHz]")
     plt.ylabel("$|Z_x|$ [$"+unitString+"$]")
     plt.legend(loc=0)
+    plt.subplots_adjust(left=0.15,bottom=0.15,right=0.98,top=0.96)
     plt.savefig("impedance.pdf")
+#    plt.savefig("impedance.png")
 
-    plt.figure(7)
+    plt.figure(7,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         plt.plot(gdfidl.Wx_s, gdfidl.Wx, label="GdfidL", color=gdfidlColor)
     plt.xlabel("s [m]")
@@ -787,9 +816,9 @@ elif runMode == "TRANS":
     plt.ylabel("$W_x$ [" + unitString + "]")
     plt.legend(loc=0)
     plt.xlim(minS,got_smax)
-    plt.savefig("wakeplot_WxNOM-vs-S.png")
+#    plt.savefig("wakeplot_WxNOM-vs-S.png")
 
-    # plt.figure(8)
+    # plt.figure(8,figsize=FIGSIZE,dpi=DPI)
     # plt.xlabel("s [m]")
     # unitString = "V/pC"
     # if lenNormalized:
@@ -799,7 +828,7 @@ elif runMode == "TRANS":
     # plt.ylabel("Envelope of $V_x$ [" + unitString + "]")
     # plt.legend(loc=0)
 
-    plt.figure(9)
+    plt.figure(9,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         sPeaks_up = []
         wPeaks_up = []
@@ -824,22 +853,29 @@ elif runMode == "TRANS":
     plt.ylabel("Envelope of $V_x$ [" + unitString + "]")
     plt.xlim(minS,got_smax)
     plt.legend(loc=0)
+    plt.subplots_adjust(left=0.15,bottom=0.15,right=0.98,top=0.96)
     plt.savefig("envelope.pdf")
+#    plt.savefig("envelope.png")
+    plt.xlim(minS,0.5)
+    plt.savefig("envelope_zoom.pdf")
+#    plt.savefig("envelope_zoom.png")
 
-    plt.figure(10)
+
+    plt.figure(10,figsize=FIGSIZE,dpi=DPI)
     if gdfidl:
         plt.plot(gdfidl.ZxF/1e9, np.real(gdfidl.Zx), label="GdfidL-real", color=gdfidlColor)
         plt.plot(gdfidl.ZxF/1e9, np.imag(gdfidl.Zx), label="GdfidL-imag", color=gdfidlColor)
-    unitString = "\Omega"
+    unitString = "\Omega\mathrm{"
     if lenNormalized:
         unitString += "/m"
     if offsetNormalized:
         unitString += "/mm"
+    unitString += "}"
     plt.xlabel("f [GHz]")
     plt.ylabel("$Z_x$ [$"+unitString+"$]")
     plt.legend(loc=0)
+    plt.subplots_adjust(left=0.15,bottom=0.15,right=0.98,top=0.96)
     plt.savefig("impedance_ReIm.pdf")
-
-
-
+#    plt.savefig("impedance_ReIm.png")
+    
     plt.show()
