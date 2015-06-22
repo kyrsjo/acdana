@@ -26,6 +26,20 @@ class Wake:
         self.Q = sciInt.simps(self.I, x=self.s)*1e12
         print "Q = ", self.Q, "[pC]"
 
+    def cropToS(self,maxS):
+        imax = 0
+#        print maxS
+        for S in self.s:
+            imax = imax+1
+            if S > maxS:
+                break
+        if imax < len(self.s):
+            print "CUTTING!"
+            self.s = self.s[:imax]
+            self.V = self.V[:imax]
+            self.I = self.I[:imax]
+            
+
 class ImpedanceSpectrum:
     wake = None
     

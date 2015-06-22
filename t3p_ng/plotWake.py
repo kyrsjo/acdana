@@ -12,15 +12,24 @@ print 'plotWake.py wakefile1(--name1) wakefile2(--name2) etc.'
 wakes = []
 imps  = []
 names = []
+maxS  = []
 
 for arg in sys.argv[1:]:
     args = arg.split('--')
     if len(args) == 1:
         wakes.append( loadWakeFile(arg) )
         names.append( arg )
+        maxS.append(None)
     elif len(args) == 2:
         wakes.append( loadWakeFile(args[0]) )
         names.append( args[1] )
+        maxS.append(None)
+    elif len(args) == 3:
+        wakes.append( loadWakeFile(args[0]) )
+        names.append( args[1] )
+        maxS.append(float(args[2]))
+        for w in wakes[-1]:
+            w.cropToS(maxS[-1])
     else:
         print "ERROR"
         exit
