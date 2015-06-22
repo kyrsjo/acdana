@@ -24,7 +24,7 @@ class Wake:
         assert len(s) == len(I)
         
         self.Q = sciInt.simps(self.I, x=self.s)*1e12
-        print "Q = ", self.Q, "[C]"
+        print "Q = ", self.Q, "[pC]"
 
 class ImpedanceSpectrum:
     wake = None
@@ -103,7 +103,7 @@ def loadWakeFile(fname):
                 print "reading:",x,y
         else:
             if inCommentBlock:
-                assert commentBlockLineCounter == 4
+                assert commentBlockLineCounter == 4 or commentBlockLineCounter == 3
                 inCommentBlock = False
     
             # Slow and ineff, but whatevs.
