@@ -11,6 +11,7 @@ print 'plotWake.py wakefile1(--name1) wakefile2(--name2) etc.'
 
 wakes = []
 imps  = []
+envs  = []
 names = []
 maxS  = []
 
@@ -34,11 +35,18 @@ for arg in sys.argv[1:]:
         print "ERROR"
         exit
     imp = []
+    env = []
     for w in wakes[-1]:
         imp.append(ImpedanceSpectrum(w))
+        env.append(Envelope(w))
     imps.append(imp)
+    envs.append(env)
 
-for (w,i,n) in zip(wakes,imps,names):
+if len(wakes) == 0:
+    print "Please provide at least one wakefile"
+    exit (1)
+
+for (w,i,e,n) in zip(wakes,imps,envs,names):
     print "Plotting '"+n+"'"
     plt.figure(1)
     wl = plt.plot(w[0].s, w[0].V, label=n)
@@ -53,6 +61,9 @@ for (w,i,n) in zip(wakes,imps,names):
     plt.figure(3)
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.abs(i[0].Z[:i[0].goodIdx]), label=n)
     #print i[0].f[:i[0].goodIdx]
+    
+    plt.figure(4)
+    plt.semilogy(e[0].s,e[0].Venv,label=n)
 
 plt.figure(1)
 plt.legend()
@@ -69,5 +80,10 @@ plt.figure(3)
 plt.legend()
 plt.xlabel("f [GHz]")
 plt.ylabel("|Z| [$\Omega$]")
+
+plt.figure(4)
+plt.legend()
+plt.xlabel("s [m]")
+plt.ylabel("V [V/pC]")
 
 plt.show()

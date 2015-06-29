@@ -82,6 +82,37 @@ class ImpedanceSpectrum:
 
         self.Z = self.V_FFT/(3e8*self.I_FFT)
 
+class Envelope:
+    wake = None
+    s = None
+    Venv = None
+    
+    s_peaksUp = None
+    V_peaksUp = None
+    s_peaksDn = None
+    V_peaksDn = None
+
+    def __init__(self,wake):
+        self.wake = wake
+        
+        self.s = self.wake.s
+
+        self.s_peaksUp = []
+        self.V_peaksUp = []
+        self.s_peaksDn = []
+        self.V_peaksDn = []
+        
+        #Double peak jumper envelope finder
+        for i in xrange(1,len(self.s)-1):
+            if self.wake.V[i-1] < self.wake.V[i] and self.wake.V[i] > self.wake.V[i+1]:
+                self.s_peaksUp.append(self.s[i])
+                self.V_peaksUp.append(self.wake.V[i])
+            elif self.wake.V[i-1] > self.wake.V[i] and self.wake.V[i] < self.wake.V[i+1]:
+                self.s_peaksDn.append(self.s[i])
+                self.V_peaksDn.append(self.wake.V[i])
+        self.Venv = ( np.interp(self.s, self.s_peaksUp, self.V_peaksUp) - np.interp(self.s, self.s_peaksDn, self.V_peaksDn) ) / 2.0
+        
+        
 def loadWakeFile(fname):
     wakes = []
     
