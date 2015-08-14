@@ -7,7 +7,7 @@ import sys
 from Wakefile import *
 
 print 'Usage:'
-print 'plotWake.py wakefile1(--name1) wakefile2(--name2) etc.'
+print 'plotWake.py wakefile1(--name1(--cutlen1)) wakefile2(--name2(--cutlen2)) etc.'
 
 wakes = []
 imps  = []
