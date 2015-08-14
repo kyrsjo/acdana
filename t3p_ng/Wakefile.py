@@ -38,7 +38,9 @@ class Wake:
             self.s = self.s[:imax]
             self.V = self.V[:imax]
             self.I = self.I[:imax]
-            
+    
+    def scaleV(self,scaleFactor):
+        self.V *= scaleFactor
 
 class ImpedanceSpectrum:
     wake = None

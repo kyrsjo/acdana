@@ -7,13 +7,14 @@ import sys
 from Wakefile import *
 
 print 'Usage:'
-print 'plotWake.py wakefile1(--name1(--cutlen1)) wakefile2(--name2(--cutlen2)) etc.'
+print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) etc.'
 
-wakes = []
-imps  = []
-envs  = []
-names = []
-maxS  = []
+wakes       = []
+imps        = []
+envs        = []
+names       = []
+maxS        = []
+scaleFactor = []
 
 for arg in sys.argv[1:]:
     args = arg.split('--')
@@ -21,19 +22,32 @@ for arg in sys.argv[1:]:
         wakes.append( loadWakeFile(arg) )
         names.append( arg )
         maxS.append(None)
+        scaleFactor.append(None)
     elif len(args) == 2:
         wakes.append( loadWakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(None)
+        scaleFactor.append(None)
     elif len(args) == 3:
         wakes.append( loadWakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
         for w in wakes[-1]:
             w.cropToS(maxS[-1])
+        scaleFactor.append(None)
+    elif len(args) == 4:
+        wakes.append( loadWakeFile(args[0]) )
+        names.append( args[1] )
+        maxS.append(float(args[2]))
+        for w in wakes[-1]:
+            w.cropToS(maxS[-1])
+        scaleFactor.append(float(args[3]))
+        for w in wakes[-1]:
+            w.scaleV(scaleFactor[-1])
     else:
-        print "ERROR"
-        exit
+        print "ERROR: Unexpected number of arguments (", len(args), ") when splitting '"+arg+"' by '--'. PEBKAC?"
+        exit(1)
+
     imp = []
     env = []
     for w in wakes[-1]:
