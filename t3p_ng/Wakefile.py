@@ -6,13 +6,13 @@ import scipy.integrate as sciInt
 class Wake:
     s = None # [m]
 
-    V = None # [V/pC]
+    V = None # [V]
     I = None # [C/m]
 
     x = None # [m]
     y = None # [m]
 
-    Q = None # [C]
+    Q = None # [pC]
 
     def __init__(self,s,V,I,x,y):
         self.s = np.asarray(s)
@@ -45,10 +45,10 @@ class Wake:
 class ImpedanceSpectrum:
     wake = None
     
-    V_FFT = None
-    I_FFT = None
+    V_FFT = None # [V/frequency]
+    I_FFT = None # [A/frequency]
     
-    Z = None
+    Z = None # [Ohm]
 
     t = None
     f = None
@@ -63,8 +63,8 @@ class ImpedanceSpectrum:
         
         self.t = self.wake.s/self.c
 
-        self.V_FFT = 1e12*self.t[-1]*np.fft.rfft(self.wake.V)/(len(self.wake.V)-1) #1e12 to scale pC^-1 -> C^-1
-        self.I_FFT = self.t[-1]*np.fft.rfft(self.wake.I)/(len(self.wake.I)-1)
+        self.V_FFT = self.t[-1]*np.fft.rfft(self.wake.V)/(len(self.wake.V)-1)
+        self.I_FFT = self.c * self.t[-1]*np.fft.rfft(self.wake.I)/(len(self.wake.I)-1)
         
         self.f = np.fft.fftfreq(self.t.size, d=self.t[1]-self.t[0])
 
@@ -82,7 +82,7 @@ class ImpedanceSpectrum:
                 print "Cutting at f=%g [GHz] corresponding to I0*exp(-3), cutLen/cutIdx=%g %%, goodLen=%i" % (self.f[i]/1e9, 100*float(self.goodIdx)/float(self.cutIdx), self.goodIdx)
                 break
 
-        self.Z = self.V_FFT/(3e8*self.I_FFT)
+        self.Z = self.V_FFT/self.I_FFT
 
 class Envelope:
     wake = None

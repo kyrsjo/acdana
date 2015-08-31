@@ -63,7 +63,7 @@ if len(wakes) == 0:
 for (w,i,e,n) in zip(wakes,imps,envs,names):
     print "Plotting '"+n+"'"
     plt.figure(1)
-    wl = plt.plot(w[0].s, w[0].V, label=n)
+    wl = plt.plot(w[0].s, w[0].V/w[0].Q, label=n)
     
     wlc = wl[0].get_color()
 
@@ -78,7 +78,12 @@ for (w,i,e,n) in zip(wakes,imps,envs,names):
     
     plt.figure(4)
     plt.semilogy(e[0].s,e[0].Venv,label=n)
-
+    
+    plt.figure(5)
+    freqRatioN = i[0].f[:i[0].goodIdx] / 11.2455e3 #f/f_rev
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].Z[:i[0].goodIdx]) / freqRatioN, color=wlc, ls='-', label=n)
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.imag(i[0].Z[:i[0].goodIdx] / freqRatioN), color=wlc, ls='--')
+    
 plt.figure(1)
 plt.legend()
 plt.xlabel("s [m]")
@@ -99,5 +104,10 @@ plt.figure(4)
 plt.legend()
 plt.xlabel("s [m]")
 plt.ylabel("V [V/pC]")
+
+plt.figure(5)
+plt.legend()
+plt.xlabel("f [GHz]")
+plt.ylabel("Z [$\Omega$]/($f/f_{rev}$)")
 
 plt.show()
