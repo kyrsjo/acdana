@@ -16,7 +16,7 @@ class Wake:
 
     def __init__(self,s,V,I,x,y):
         self.s = np.asarray(s)
-        self.V = np.asarray(V)
+        self.V = -1.0*np.asarray(V) #To conform to convention W(0+) > 0
         self.I = np.asarray(I)
         self.x = x
         self.y = y

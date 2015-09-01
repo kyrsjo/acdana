@@ -63,9 +63,10 @@ if len(wakes) == 0:
 for (w,i,e,n) in zip(wakes,imps,envs,names):
     print "Plotting '"+n+"'"
     plt.figure(1)
-    wl = plt.plot(w[0].s, w[0].V/w[0].Q, label=n)
-    
+    wl = plt.plot(w[0].s, w[0].V/w[0].Q, label=n, ls='-')
     wlc = wl[0].get_color()
+    Iscale = max(w[0].V/w[0].Q)/max(w[0].I)
+    plt.plot(w[0].s, w[0].I*Iscale, ls='--',color=wlc)
 
     plt.figure(2)
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].Z[:i[0].goodIdx]), color=wlc, ls='-', label=n)
@@ -77,7 +78,7 @@ for (w,i,e,n) in zip(wakes,imps,envs,names):
     #print i[0].f[:i[0].goodIdx]
     
     plt.figure(4)
-    plt.semilogy(e[0].s,e[0].Venv,label=n)
+    plt.semilogy(e[0].s,e[0].Venv/w[0].Q,label=n)
     
     plt.figure(5)
     freqRatioN = i[0].f[:i[0].goodIdx] / 11.2455e3 #f/f_rev
@@ -93,7 +94,6 @@ plt.figure(2)
 plt.legend()
 plt.xlabel("f [GHz]")
 plt.ylabel("Z [$\Omega$]")
-
 
 plt.figure(3)
 plt.legend()
