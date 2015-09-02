@@ -8,7 +8,7 @@ jobs = []
 for arg in sys.argv[1:]:
     jobs.append(arg)
 if len(jobs) == 0:
-    jobs.append["./"]
+    jobs.append("./")
 print jobs
 
 SparamFile = open("SParameter.out",'r')
