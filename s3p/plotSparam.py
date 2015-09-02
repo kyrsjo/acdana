@@ -1,6 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import re
+import sys
+
+jobs = []
+
+for arg in sys.argv[1:]:
+    jobs.append(arg)
+if len(jobs) == 0:
+    jobs.append["./"]
+print jobs
 
 SparamFile = open("SParameter.out",'r')
 
@@ -19,7 +28,7 @@ freq  = []
 S     = []
 Sabs  = []
 Sang  = []
-
+Sdet  = []
 
 while True:
     line = SparamFile.readline()
@@ -49,18 +58,20 @@ while True:
     Sabs.append(np.abs(S[-1]))
     Sang.append(np.angle(S[-1]))
     
-for i in xrange(len(freq)):
-    print freq[i]
-    print S[i]
-    print Sabs[i]
-    print Sang[i]
-    print abs(np.linalg.det(S[i])) # S should be unitary, so this should be 1.0
-    print
+    Sdet.append(np.linalg.det(S[-1]))
+    
+# for i in xrange(len(freq)):
+#     print freq[i]
+#     print S[i]
+#     print Sabs[i]
+#     print Sang[i]
+#     print abs(np.linalg.det(S[i])) # S should be unitary, so this should be 1.0
+#     print
 
 S    = np.asarray(S)
 Sabs = np.asarray(Sabs)
 Sang = np.asarray(Sang)
-
+Sdet = np.asarray(Sdet)
 
 plt.figure()
 for i in xrange(numModes):
@@ -77,5 +88,12 @@ for i in xrange(numModes):
 plt.legend()
 plt.xlabel("angle(S) [radians]")
 plt.ylabel("Frequency [Hz]")
+
+plt.figure()
+plt.plot(freq,np.abs(Sdet))
+plt.axhline(1.0,ls="--", color="r")
+plt.ylabel("|det(S)|")
+plt.xlabel("Frequency [Hz]")
+
 
 plt.show()
