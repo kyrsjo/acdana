@@ -6,8 +6,14 @@ import os
 
 jobs = []
 titles = []
+useDB = False
 
 for arg in sys.argv[1:]:
+    
+    if arg == "--dB":
+        useDB = True
+        continue
+    
     argsplit = arg.split("--")
     if len(argsplit) == 2:
         jobs  .append(argsplit[0])
@@ -99,7 +105,10 @@ for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
     for i in xrange(simData[-1].numModes):
         for j in xrange(i,simData[-1].numModes):
             plt.figure(1)
-            plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
+            if useDB:
+                plt.plot(simData[-1].freq,10*np.log10(simData[-1].Sabs[:,i,j]), label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
+            else:
+                plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
             
             plt.figure(2)
             plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
@@ -108,7 +117,10 @@ for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
             plt.plot(simData[-1].freq,np.abs(simData[-1].Sdet), label=title)
             
             plt.figure(100+i+j*simData[-1].numModes)
-            plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label=title)
+            if useDB:
+                plt.plot(simData[-1].freq,np.log10(simData[-1].Sabs[:,i,j]), label=title)
+            else:
+                plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label=title)
 
             plt.figure(300+i+j*simData[-1].numModes)
             plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label=title)
@@ -116,7 +128,10 @@ for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
             if idx == len(jobs)-1:
                 plt.figure(100+i+j*simData[-1].numModes)
                 plt.title("$S_{"+str(i)+","+str(j)+"}$")
-                plt.ylabel("|S|")
+                if useDB:
+                    plt.ylabel("|S| [dB]")
+                else:
+                    plt.ylabel("|S|")
                 plt.xlabel("Frequency [Hz]")
                 plt.legend(loc=0)
 
@@ -127,11 +142,14 @@ for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
                 plt.legend(loc=0)
                 plt.yticks((-np.pi,-np.pi/2,0,np.pi/2,np.pi),
                            ("$-\pi$","$-\pi/2$",0,"$\pi/2$","$\pi$"))
-
+                
     if idx == len(jobs)-1:
         plt.figure(1)
         plt.legend(loc=0)
-        plt.ylabel("|S|")
+        if useDB:
+            plt.ylabel("|S| [dB]")
+        else:
+            plt.ylabel("|S|")
         plt.xlabel("Frequency [Hz]")
 
         plt.figure(2)
@@ -140,8 +158,7 @@ for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
         plt.xlabel("Frequency [Hz]")
         plt.yticks((-np.pi,-np.pi/2,0,np.pi/2,np.pi),
                    ("$-\pi$","$-\pi/2$",0,"$\pi/2$","$\pi$"))
-
-
+        
         plt.figure(3)        
         plt.axhline(1.0,ls="--", color="r")
         plt.ylabel("|det(S)|")
