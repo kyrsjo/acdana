@@ -101,33 +101,51 @@ for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
             plt.figure(1)
             plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
             
+            plt.figure(2)
+            plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
+
+            plt.figure(3)
+            plt.plot(simData[-1].freq,np.abs(simData[-1].Sdet), label=title)
+            
             plt.figure(100+i+j*simData[-1].numModes)
             plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label=title)
+
+            plt.figure(300+i+j*simData[-1].numModes)
+            plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label=title)
+            
             if idx == len(jobs)-1:
+                plt.figure(100+i+j*simData[-1].numModes)
                 plt.title("$S_{"+str(i)+","+str(j)+"}$")
-                plt.legend()
+                plt.ylabel("|S|")
+                plt.xlabel("Frequency [Hz]")
+                plt.legend(loc=0)
+
+                plt.figure(300+i+j*simData[-1].numModes)
+                plt.title("$S_{"+str(i)+","+str(j)+"}$")
+                plt.ylabel("angle(S) [radians]")
+                plt.xlabel("Frequency [Hz]")
+                plt.legend(loc=0)
+                plt.yticks((-np.pi,-np.pi/2,0,np.pi/2,np.pi),
+                           ("$-\pi$","$-\pi/2$",0,"$\pi/2$","$\pi$"))
+
     if idx == len(jobs)-1:
         plt.figure(1)
-        plt.legend()
-        plt.xlabel("|S|")
-        plt.ylabel("Frequency [Hz]")
+        plt.legend(loc=0)
+        plt.ylabel("|S|")
+        plt.xlabel("Frequency [Hz]")
 
-    plt.figure(2)
-    for i in xrange(simData[-1].numModes):
-        for j in xrange(i,simData[-1].numModes):
-            plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
-    if idx == len(jobs)-1:
-        plt.legend()
-        plt.xlabel("angle(S) [radians]")
-        plt.ylabel("Frequency [Hz]")
+        plt.figure(2)
+        plt.legend(loc=0)
+        plt.ylabel("angle(S) [radians]")
+        plt.xlabel("Frequency [Hz]")
+        plt.yticks((-np.pi,-np.pi/2,0,np.pi/2,np.pi),
+                   ("$-\pi$","$-\pi/2$",0,"$\pi/2$","$\pi$"))
 
-    plt.figure(3)
-    plt.plot(simData[-1].freq,np.abs(simData[-1].Sdet), label=title)
-    if idx == len(jobs)-1:
+
+        plt.figure(3)        
         plt.axhline(1.0,ls="--", color="r")
         plt.ylabel("|det(S)|")
         plt.xlabel("Frequency [Hz]")
-        plt.legend()
-
+        plt.legend(loc=0)
 
 plt.show()
