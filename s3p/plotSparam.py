@@ -5,11 +5,19 @@ import sys
 import os
 
 jobs = []
+titles = []
 
 for arg in sys.argv[1:]:
-    jobs.append(arg)
+    argsplit = arg.split("--")
+    if len(argsplit) == 2:
+        jobs  .append(argsplit[0])
+        titles.append(argsplit[1])
+    else:
+        jobs.append(arg)
+        titles.append(arg)
 if len(jobs) == 0:
     jobs.append("./")
+    titles.append("")
 
 class SparamFileData:
     
@@ -82,31 +90,44 @@ class SparamFileData:
             self.Sang = np.asarray(Sang)
             self.Sdet = np.asarray(Sdet)
 
+#TODO: The numModes should be the same for all data in order to compare
+
 simData = []
-for job in jobs:
+for job,title,idx in zip(jobs,titles,xrange(len(jobs))):
     simData.append(SparamFileData(job))
     
-    plt.figure()
     for i in xrange(simData[-1].numModes):
         for j in xrange(i,simData[-1].numModes):
-            plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$")
-    plt.legend()
-    plt.xlabel("|S|")
-    plt.ylabel("Frequency [Hz]")
+            plt.figure(1)
+            plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
+            
+            plt.figure(100+i+j*simData[-1].numModes)
+            plt.plot(simData[-1].freq,simData[-1].Sabs[:,i,j], label=title)
+            if idx == len(jobs)-1:
+                plt.title("$S_{"+str(i)+","+str(j)+"}$")
+                plt.legend()
+    if idx == len(jobs)-1:
+        plt.figure(1)
+        plt.legend()
+        plt.xlabel("|S|")
+        plt.ylabel("Frequency [Hz]")
 
-    plt.figure()
+    plt.figure(2)
     for i in xrange(simData[-1].numModes):
         for j in xrange(i,simData[-1].numModes):
-            plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$")
-    plt.legend()
-    plt.xlabel("angle(S) [radians]")
-    plt.ylabel("Frequency [Hz]")
+            plt.plot(simData[-1].freq,simData[-1].Sang[:,i,j], label="$S_{"+str(i)+","+str(j)+"}$ (" + title + ")")
+    if idx == len(jobs)-1:
+        plt.legend()
+        plt.xlabel("angle(S) [radians]")
+        plt.ylabel("Frequency [Hz]")
 
-    plt.figure()
-    plt.plot(simData[-1].freq,np.abs(simData[-1].Sdet))
-    plt.axhline(1.0,ls="--", color="r")
-    plt.ylabel("|det(S)|")
-    plt.xlabel("Frequency [Hz]")
+    plt.figure(3)
+    plt.plot(simData[-1].freq,np.abs(simData[-1].Sdet), label=title)
+    if idx == len(jobs)-1:
+        plt.axhline(1.0,ls="--", color="r")
+        plt.ylabel("|det(S)|")
+        plt.xlabel("Frequency [Hz]")
+        plt.legend()
 
 
 plt.show()
