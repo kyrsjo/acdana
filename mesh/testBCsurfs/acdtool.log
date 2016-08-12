@@ -1,0 +1,119 @@
+*************************************************************
+			 ACDTool
+
+ACE3P Codes Source Date:   Wed Nov 9 16:14:51 2011 -0800
+ACE3P Codes Source Tag :   cee03ebfdee46182c61b7fb5f3af846959142b8c
+Support Lib Source Date:   Tue Oct 25 17:08:35 2011 -0700
+Support Lib Source Tag :   59a2af22c3d4ca1c49681d1c6802538a82487926
+Compiled on:   Wed Nov  9 16:25:56 PST 2011
+
+*************************************************************
+
+         Copyright 2011, Stanford University 
+
+Authors make no representations or warranties, expressed or 
+implied. By way of example, but not limitation, authors make 
+no representatinos or warranties of merchantibility or 
+fitness for any particular purpose or that the use of the 
+software componentns of documentation will not infringe any
+patents, copyrights, trademarks or other rights.
+
+The Authors shall not be held liable for any liability 
+nor for any direct, indirect or consequential damages with 
+respect to any claim by users or any third party on account 
+of or arising from the use of this software.
+
+*************************************************************
+
+Advanced Computations Department
+SLAC National Accelerator Laboratory
+https://slacportal.slac.stanford.edu/sites/ard_public/acd/Pages/Default.aspx
+Contact: ace3p@slac.stanford.edu
+
+Thank you for citing ACE3P when publishing related results.
+
+*************************************************************
+
+Starting master process on pcbe15843.cern.ch
+Number of MPI processes: 1
+Number of compute nodes: 1
+Number of processes per node: 1
+Data precision: 64 bits
+Compiler: 4.4.4 20100726 (Red Hat 4.4.4-13)
+
+Input: mesh_brick.gen (contains straight 4-point elements)
+Reading took 0.162117 seconds
+
+Output: mesh_brick.ncdf
+Writing took 0.015923 seconds
+
+
+Now calling 'acdtool mesh stats mesh_brick.ncdf':
+TOTALS:
+  elements: 9729
+  coordinates: 1985
+
+EULER CHARACTER:
+  Surf Euler Char = 2
+  Vol Euler Char = 1
+  Euler Char is OK.
+
+ASPECT RATIO:
+  min      = 1.06399
+  max      = 2.75465 <- GREAT
+  average  = 1.5316
+  std dev  = 0.19978
+
+SHAPE MEASURE:
+  min      = 0.49434 <- GREAT
+  max      = 0.996342
+  average  = 0.836899
+  std dev  = 0.0914793
+
+ELEMENT VOLUME:
+  min      = 0.0278449
+  max      = 0.2805
+  average  = 0.102785
+  std dev  = 0.0292301
+
+BOUNDING BOX:
+  min      = (-5, -5, -5)
+  max      = (5, 5, 5)
+
+EDGE LENGTH:
+  min      = 0.416942
+  max      = 1.6885
+  average  = 1.02258
+  std dev  = 0.175409
+
+Existing boundary IDs: 
+6 
+
+Material IDs 	 Number of Elems:
+1:	 	 9729
+
+
+
+Now calling 'acdtool mesh check mesh_brick.ncdf':
+
+
+
+******************************************************************************
+Reading the mesh and midpoints ...
+******************************************************************************
+
+
+
+******************************************************************************
+Check whether there are invalid quadratic tetrahedral elements... 
+******************************************************************************
+
+
+
+
+
+
+******************************************************************************
+Total Volume is 1000
+Total Number of invalid second order tetrahedral elements (ISOTE) is: 0
+******************************************************************************

@@ -1,0 +1,7 @@
+
+
+Warning: ACE3P codes will not benefit from curved elements.
+Specify 'block XX element type tetra10' in Cubit to generate curved boundary elements.
+
+
+Warning: No curved elements found in the meshfile mesh_brick.ncdf
