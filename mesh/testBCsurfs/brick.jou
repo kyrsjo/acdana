@@ -1,0 +1,15 @@
+reset
+
+set node constraint on
+
+brick x 10 y 10 z 10
+volume 1  scheme Tetmesh proximity layers off geometry approximation angle 15 
+volume 1  tetmesh growth_factor 1 
+Trimesher surface gradation 1.3
+Trimesher volume gradation 1.3
+mesh volume 1 
+
+
+block 1 volume all
+sideset 6 surface all
+export genesis "mesh_brick.gen" block all overwrite
