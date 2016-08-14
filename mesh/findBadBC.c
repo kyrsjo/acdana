@@ -12,6 +12,7 @@ struct tri_listnode {
   int i1;
   int i2;
   int i3;
+  int inTet;
   int SS;
   struct tri_listnode* next;
 };
@@ -22,7 +23,7 @@ size_t lonely_tris_num;
 FILE* f2;
 size_t doubleBC;
 
-void checkTri(int idx1, int idx2, int idx3, int SS, double* coords);
+void checkTri(int idx1, int idx2, int idx3, int SS, double* coords, int inTet);
 
 int main(int argc, char* argv[]) {
   if (argc != 2) {
@@ -102,12 +103,13 @@ int main(int argc, char* argv[]) {
   
   for (int i = 0; i < tetexterior; i++) {
     size_t idx_off = i*tetexteriorsize;
-    //printf("%zu %i %i %i %i %i\n", idx_off, tet_ext[idx_off+1], tet_ext[idx_off+2], tet_ext[idx_off+3], tet_ext[idx_off+4], tet_ext[idx_off+8]);
+    printf("%i %i %i %i %i %i\n", i, tet_ext[idx_off+1], tet_ext[idx_off+2], tet_ext[idx_off+3], tet_ext[idx_off+4], tet_ext[idx_off+8]);
 
-    checkTri(tet_ext[idx_off+1],tet_ext[idx_off+2],tet_ext[idx_off+3], tet_ext[idx_off+5], coords);
-    checkTri(tet_ext[idx_off+1],tet_ext[idx_off+2],tet_ext[idx_off+4], tet_ext[idx_off+6],coords);
-    checkTri(tet_ext[idx_off+1],tet_ext[idx_off+3],tet_ext[idx_off+4], tet_ext[idx_off+7],coords);
-    checkTri(tet_ext[idx_off+2],tet_ext[idx_off+3],tet_ext[idx_off+4], tet_ext[idx_off+8], coords);
+    checkTri(tet_ext[idx_off+1],tet_ext[idx_off+2],tet_ext[idx_off+3], tet_ext[idx_off+5], coords,i);
+    checkTri(tet_ext[idx_off+1],tet_ext[idx_off+2],tet_ext[idx_off+4], tet_ext[idx_off+7], coords,i);
+    checkTri(tet_ext[idx_off+1],tet_ext[idx_off+3],tet_ext[idx_off+4], tet_ext[idx_off+6], coords,i);
+    checkTri(tet_ext[idx_off+2],tet_ext[idx_off+3],tet_ext[idx_off+4], tet_ext[idx_off+8], coords,i);
+
   }
   fclose(f2);
   
@@ -149,7 +151,7 @@ int main(int argc, char* argv[]) {
 }
 
 
-void checkTri(int idx1, int idx2, int idx3, int SS, double* coords) {
+void checkTri(int idx1, int idx2, int idx3, int SS, double* coords, int inTet) {
   // Make sure the indices are in increasing order
   int i1, i2, i3;
   i1 = idx1; i2=idx2; i3=idx3;
@@ -166,25 +168,25 @@ void checkTri(int idx1, int idx2, int idx3, int SS, double* coords) {
     //printf("%i %i %i\n",i1,i2,i3);
   }
 
-  /* 
-    //Debug
-    if (!(i1<i2 && i2<i3)){
+
+  //Debug
+  if (!(i1<i2 && i2<i3)){
     printf("ERR\n");
     exit(1);
   }
-  */
+
 
   //Compare the current tri with all known lonely tris:
-  struct tri_listnode* lonely_tris_curr = lonely_tris;
+  struct tri_listnode*  lonely_tris_curr     =  lonely_tris; //List element which we are working on
   struct tri_listnode** lonely_tris_currLink = &lonely_tris; //Pointer to the pointer to the current element (i.e. inside the previous element or the root pointer)
   while (lonely_tris_curr != NULL) {
     if (lonely_tris_curr->i1 == i1 &&
 	lonely_tris_curr->i2 == i2 &&
 	lonely_tris_curr->i3 == i3    ) {
-      //printf("MATCH!\n");
-
+      
       //Check if there is a non-internal BC set
       if(SS != -1 || lonely_tris_curr->SS != -1) {
+	printf("Internal non-lonely %i %i : %i %i %i : %i\n", SS, lonely_tris_curr->SS, i1, i2, i3, lonely_tris_curr->inTet);
 	fprintf(f2,"%.10e,%.10e,%.10e,1\n", coords[lonely_tris_curr->i1*3], coords[lonely_tris_curr->i1*3+1], coords[lonely_tris_curr->i1*3+2]);
 	fprintf(f2,"%.10e,%.10e,%.10e,1\n", coords[lonely_tris_curr->i2*3], coords[lonely_tris_curr->i2*3+1], coords[lonely_tris_curr->i2*3+2]);
 	fprintf(f2,"%.10e,%.10e,%.10e,1\n", coords[lonely_tris_curr->i3*3], coords[lonely_tris_curr->i3*3+1], coords[lonely_tris_curr->i3*3+2]);
@@ -206,6 +208,7 @@ void checkTri(int idx1, int idx2, int idx3, int SS, double* coords) {
     lonely_tris_curr->i1=i1;
     lonely_tris_curr->i2=i2;
     lonely_tris_curr->i3=i3;
+    lonely_tris_curr->inTet=inTet;
     lonely_tris_curr->SS=SS;
     lonely_tris_curr->next=NULL;
     lonely_tris_num++;
