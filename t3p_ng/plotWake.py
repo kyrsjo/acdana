@@ -7,16 +7,27 @@ import sys
 from Wakefile import *
 
 print 'Usage:'
-print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) etc.'
+print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans) etc.'
+
+doTrans = False
 
 wakes       = []
 imps        = []
 envs        = []
+wakes_trans = []
+imps_trans  = []
+envs_trans  = []
 names       = []
 maxS        = []
 scaleFactor = []
 
 for arg in sys.argv[1:]:
+    if arg=="--trans":
+        doTrans=True
+        if not len(wakes)==0:
+            print "'--trans' keyword should come first"
+            exit(1)
+        continue
     args = arg.split('--')
     if len(args) == 1:
         wakes.append( loadWakeFile(arg) )
@@ -47,7 +58,7 @@ for arg in sys.argv[1:]:
     else:
         print "ERROR: Unexpected number of arguments (", len(args), ") when splitting '"+arg+"' by '--'. PEBKAC?"
         exit(1)
-
+    
     imp = []
     env = []
     for w in wakes[-1]:
@@ -56,11 +67,42 @@ for arg in sys.argv[1:]:
     imps.append(imp)
     envs.append(env)
 
+    if doTrans:
+        vx  = []
+        imp = []
+        env = []
+
+        #Calculate transverse x-component, assuming single wake and antisymmetry around x=0
+        # Code copied from old "TRANSSYM" mode
+        assert len(wakes[-1])==1
+        wl = wakes[-1][0]
+
+        dx = wl.x
+        s  = wl.s
+        dVzDx = np.zeros_like(s)
+        V_x = np.zeros_like(s)
+        for si in xrange(1,len(s)):
+            dVzDx[si] = wl.V[si]/dx
+            if si%2==0:
+                V_x[si] = (s[si]-s[si-2])*(dVzDx[si-2]+4*dVzDx[si-1]+dVzDx[si])/6.0 + V_x[si-2]
+            else:
+                V_x[si] = 0.5*(s[si]-s[si-1])*(dVzDx[si-1] + dVzDx[si]) + V_x[si-1]
+        wx = (Wake(s,V_x,wl.I,0.0,wl.y))
+        
+        wakes_trans.append((wx,))
+        imps_trans.append(None)
+        envs_trans.append(None)
+        
+    else:
+        wakes_trans.append(None)
+        imps_trans.append(None)
+        envs_trans.append(None)
+        
 if len(wakes) == 0:
     print "Please provide at least one wakefile"
     exit (1)
 
-for (w,i,e,n) in zip(wakes,imps,envs,names):
+for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,envs_trans):
     print "Plotting '"+n+"'"
     plt.figure(1)
     wl = plt.plot(w[0].s, w[0].V/w[0].Q, label=n, ls='-')
@@ -84,6 +126,10 @@ for (w,i,e,n) in zip(wakes,imps,envs,names):
     freqRatioN = i[0].f[:i[0].goodIdx] / 11.2455e3 #f/f_rev
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].Z[:i[0].goodIdx]) / freqRatioN, color=wlc, ls='-', label=n)
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.imag(i[0].Z[:i[0].goodIdx] / freqRatioN), color=wlc, ls='--')
+
+    if doTrans:
+        plt.figure(11)
+        wx = plt.plot(wt[0].s, wt[0].V/wt[0].Q)
     
 plt.figure(1)
 plt.legend()

@@ -147,7 +147,7 @@ def loadWakeFile(fname):
                 
             if commentBlockLineCounter == 2:
                 (x,y) = map(float,l[2:-2].split(','))
-                print "reading:",x,y
+                print "reading point x=%g, y=%g"%(x,y)
         else:
             if inCommentBlock:
                 assert commentBlockLineCounter == 4 or commentBlockLineCounter == 3
