@@ -125,6 +125,7 @@ if runMode != "PLOTFILE":
             data[-1].extraNorm = 1.0
             data[-1].normalizeShift()
             data[-1].transsym = transsym
+            data[-1].fitParams = None
 
         elif "," in fname:
             fname = fname.split(",")
@@ -141,6 +142,7 @@ if runMode != "PLOTFILE":
                 data[-1].extraNorm = 1.0
                 data[-1].normalizeShift()
                 data[-1].transsym = transsym
+                data[-1].fitParams = None
 
         else:
             data = [WR.WakefieldReader(fname),]
@@ -151,6 +153,7 @@ if runMode != "PLOTFILE":
             data[-1].extraNorm = 1.0
             data[-1].normalizeShift()
             data[-1].transsym = transsym
+            data[-1].fitParams = None
     except:
         print "problem parsing fname"
         print
@@ -637,17 +640,18 @@ elif runMode == "TRANS":
         freqSum=0.0; freqSum2=0.0
         QSum=0.0; QSum2=0.0
         ASum=0.0; ASum2=0.0
-        for fp in d.fitParams:
-            fitParams.append(makeFit(fp[0], fp[1]))
-            
-            freqSum  += fitParams[-1][0][0]*3e8/1e9
-            freqSum2 += (fitParams[-1][0][0]*3e8/1e9)**2
-            
-            QSum  += fitParams[-1][0][1]
-            QSum2 += fitParams[-1][0][1]**2
-            
-            ASum  += fitParams[-1][0][2]
-            ASum2 += fitParams[-1][0][2]**2
+        if d.fitParams:
+            for fp in d.fitParams:
+                fitParams.append(makeFit(fp[0], fp[1]))
+                
+                freqSum  += fitParams[-1][0][0]*3e8/1e9
+                freqSum2 += (fitParams[-1][0][0]*3e8/1e9)**2
+                
+                QSum  += fitParams[-1][0][1]
+                QSum2 += fitParams[-1][0][1]**2
+                
+                ASum  += fitParams[-1][0][2]
+                ASum2 += fitParams[-1][0][2]**2
         if len(fitParams) > 0:
             print "Freq. average =", freqSum/float(len(fitParams)), " +- ", \
                 np.sqrt( freqSum2/float(len(fitParams)) - (freqSum/float(len(fitParams)))**2 )
