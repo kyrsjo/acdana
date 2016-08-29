@@ -119,16 +119,16 @@ for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,env
     
     #Longitudinal wake spectrum (abs)
     plt.figure(3)
-    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.abs(i[0].Z[:i[0].goodIdx]), label=n,color=wlc,ls="--")
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.abs(i[0].Z[:i[0].goodIdx]), label=n,color=wlc,ls="-")
     #print i[0].f[:i[0].goodIdx]
 
     #Longitudinal wake envelope
     plt.figure(4)
-    plt.plot(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="--")
+    plt.plot(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="-")
 
     #Longitudinal wake (log y)
     plt.figure(5)
-    plt.semilogy(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="--")
+    plt.semilogy(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="-")
     
     #Normalized spectrum
     # plt.figure(6)
@@ -148,16 +148,16 @@ for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,env
 
         #Transverse wake spectrum (abs)
         plt.figure(13)
-        plt.plot(it[0].f[:i[0].goodIdx]/1e9, np.abs(it[0].Z[:i[0].goodIdx]), label=n,color=wlc,ls="--")
+        plt.plot(it[0].f[:i[0].goodIdx]/1e9, np.abs(it[0].Z[:i[0].goodIdx]), label=n,color=wlc,ls="-")
         #print i[0].f[:i[0].goodIdx]
 
         #Transverse wake envelope
         plt.figure(14)
-        plt.plot(et[0].s,et[0].Venv/wt[0].Q,label=n,color=wlc,ls="--")
+        plt.plot(et[0].s,et[0].Venv/wt[0].Q,label=n,color=wlc,ls="-")
         
         #Transverse wake envelope (log y)
         plt.figure(15)
-        plt.semilogy(et[0].s,et[0].Venv/wt[0].Q,label=n,color=wlc,ls="--")
+        plt.semilogy(et[0].s,et[0].Venv/wt[0].Q,label=n,color=wlc,ls="-")
         
         #Normalized transverse spectrum
         # plt.figure(6)
@@ -172,7 +172,7 @@ plt.xlabel("s [m]")
 plt.ylabel("$V_z$ [V/pC]")
 
 plt.figure(2)
-plt.legend()
+plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 plt.ylabel("$Z_z$ [$\Omega$]")
 
