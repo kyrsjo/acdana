@@ -24,11 +24,12 @@ class Wake:
         assert len(s) == len(I)
         
         self.Q = sciInt.simps(self.I, x=self.s)*1e12
-        print "Q = ", self.Q, "[pC]"
-
+        print "Q =", self.Q, "[pC]"
+        print "maxS =", self.s[-1], "[m]"
+        
     def cropToS(self,maxS):
         imax = 0
-#        print maxS
+        print "Wakefield::cropToS(): Cutting to s=",maxS
         for S in self.s:
             imax = imax+1
             if S > maxS:
@@ -55,15 +56,21 @@ class ImpedanceSpectrum:
     
     cutIdx = None
     goodIdx = None
+
+    windowFunc = None
     
     c = 299792458 #[m/s]
-    
-    def __init__(self,wake):
-        self.wake = wake
-        
-        self.t = self.wake.s/self.c
 
-        self.V_FFT = self.t[-1]*np.fft.rfft(self.wake.V)/(len(self.wake.V)-1)
+    def __init__(self, wake, windowFunc=None):
+        self.wake = wake
+
+        self.t = self.wake.s/self.c
+        if windowFunc==None:
+            windowFunc = self.window_rect
+        self.windowFunc = windowFunc
+        window = self.windowFunc(len(self.wake.V))
+        
+        self.V_FFT = self.t[-1]*np.fft.rfft(self.wake.V*window)/(len(self.wake.V)-1)
         self.I_FFT = self.c * self.t[-1]*np.fft.rfft(self.wake.I)/(len(self.wake.I)-1)
         
         self.f = np.fft.fftfreq(self.t.size, d=self.t[1]-self.t[0])
@@ -84,6 +91,52 @@ class ImpedanceSpectrum:
 
         self.Z = self.V_FFT/self.I_FFT
 
+    # Window functions from
+    # https://en.wikipedia.org/wiki/Window_function
+    
+    @staticmethod
+    def window_rect(N):
+        return 1.0
+
+    window_rectN_cut = 0
+    @staticmethod
+    def window_rectN(N):
+        w = np.ones(N)
+        print N,ImpedanceSpectrum.window_rectN_cut, w
+        w[-ImpedanceSpectrum.window_rectN_cut:] = 0.0
+        print w
+        return w
+        
+    @staticmethod
+    def window_tri(N):
+        n = np.arange(N)
+        return 1.0 - np.abs(n-(N-2)/2.0) / ((N-1)/2.0)
+
+    @staticmethod
+    def window_welch(N):
+        n = np.arange(N)
+        return 1.0 - (np.abs(n-(N-2)/2.0) / ((N-1)/2.0))**2
+
+    @staticmethod
+    def window_hanning(N):
+        n = np.arange(N)
+        return 0.5*(1.0 - np.cos(2*np.pi*n/(N-1)))
+
+    @staticmethod
+    def window_hamming(N):
+        n = np.arange(N)
+        return (25.0/46.0) - ((46.0-25.0)/46.0)*np.cos(2*np.pi*n/float(N-1))
+
+    @staticmethod
+    def window_blackmanHarris(N):
+        n = np.arange(N)
+        return 0.35875 - 0.48829*np.cos(2*np.pi*n/float(N-1)) + 0.14128*np.cos(4*np.pi*n/float(N-1)) - 0.01168*np.cos(6*np.pi*n/float(N-1))
+
+    @staticmethod
+    def window_flatTop(N):
+        n = np.arange(N)
+        return 1 - 1.93*np.cos(2*np.pi*n/float(N-1)) + 1.29*np.cos(4*np.pi*n/float(N-1)) - 0.338*np.cos(6*np.pi*n/float(N-1)) + 0.028*np.cos(8*np.pi*n/float(N-1))
+    
 class Envelope:
     wake = None
     s = None

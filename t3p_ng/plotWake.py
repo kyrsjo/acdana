@@ -7,7 +7,8 @@ import sys
 from Wakefile import *
 
 print 'Usage:'
-print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans) etc.'
+print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans) (--window={rect|rectN|tri|welch|hanning|hamming|blackmanHarris|flatTop}) etc.'
+print "Note that the windows affect the wakes calculated AFTER it's specification, or until the the next window. The default window is 'rect' (aka 'no window')"
 
 doTrans = False
 
@@ -21,11 +22,38 @@ names       = []
 maxS        = []
 scaleFactor = []
 
+window = None
+
 for arg in sys.argv[1:]:
     if arg=="--trans":
         doTrans=True
         if not len(wakes)==0:
             print "'--trans' keyword should come first"
+            exit(1)
+        continue
+    elif arg.startswith("--window="):
+        winString = arg.split("=")[1]
+        print "Window type set = '" + winString + "'"
+        if winString.startswith("rect"):
+            if winString=="rect":
+                window=ImpedanceSpectrum.window_rect
+            else:
+                ImpedanceSpectrum.window_rectN_cut=int(winString[4:])
+                window=ImpedanceSpectrum.window_rectN
+        elif winString=="tri":
+            window=ImpedanceSpectrum.window_tri
+        elif winString=="welch":
+            window=ImpedanceSpectrum.window_welch
+        elif winString=="hanning":
+            window=ImpedanceSpectrum.window_hanning
+        elif winString=="hamming":
+            window=ImpedanceSpectrum.window_hamming
+        elif winString=="blackmanHarris":
+            window=ImpedanceSpectrum.window_blackmanHarris
+        elif winString=="flatTop":
+            window=ImpedanceSpectrum.window_flatTop
+        else:
+            print "Cannot recognize window name"
             exit(1)
         continue
     args = arg.split('--')
@@ -62,7 +90,7 @@ for arg in sys.argv[1:]:
     imp = []
     env = []
     for w in wakes[-1]:
-        imp.append(ImpedanceSpectrum(w))
+        imp.append(ImpedanceSpectrum(w,window))
         env.append(Envelope(w))
     imps.append(imp)
     envs.append(env)
@@ -90,7 +118,7 @@ for arg in sys.argv[1:]:
         wx = (Wake(s,V_x,wl.I,0.0,wl.y))
         
         wakes_trans.append((wx,))
-        imps_trans.append((ImpedanceSpectrum(wx),))
+        imps_trans.append((ImpedanceSpectrum(wx,window),))
         envs_trans.append((Envelope(wx),))
         
     else:
@@ -117,21 +145,32 @@ for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,env
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].Z[:i[0].goodIdx]), color=wlc, ls='-', label=n)
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.imag(i[0].Z[:i[0].goodIdx]), color=wlc, ls='--')
     
-    #Longitudinal wake spectrum (abs)
+    #Longitudinal voltage spectrum (re/im)
     plt.figure(3)
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].V_FFT[:i[0].goodIdx]), color=wlc, ls='-', label=n)
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.imag(i[0].V_FFT[:i[0].goodIdx]), color=wlc, ls='--')
+
+    #Longitudinal bunch spectrum (re/im)
+    plt.figure(4)
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].I_FFT[:i[0].goodIdx]), color=wlc, ls='-', label=n)
+    plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.imag(i[0].I_FFT[:i[0].goodIdx]), color=wlc, ls='--')
+
+    
+    #Longitudinal wake spectrum (abs)
+    plt.figure(5)
     plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.abs(i[0].Z[:i[0].goodIdx]), label=n,color=wlc,ls="-")
     #print i[0].f[:i[0].goodIdx]
 
     #Longitudinal wake envelope
-    plt.figure(4)
+    plt.figure(6)
     plt.plot(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="-")
 
     #Longitudinal wake (log y)
-    plt.figure(5)
+    plt.figure(7)
     plt.semilogy(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="-")
     
     #Normalized spectrum
-    # plt.figure(6)
+    # plt.figure(8)
     # freqRatioN = i[0].f[:i[0].goodIdx] / 11.2455e3 #f/f_rev
     # plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.real(i[0].Z[:i[0].goodIdx]) / freqRatioN, color=wlc, ls='-', label=n)
     # plt.plot(i[0].f[:i[0].goodIdx]/1e9, np.imag(i[0].Z[:i[0].goodIdx] / freqRatioN), color=wlc, ls='--')
@@ -177,22 +216,31 @@ plt.xlabel("f [GHz]")
 plt.ylabel("$Z_z$ [$\Omega$]")
 
 plt.figure(3)
+plt.legend(loc=0)
+plt.xlabel("f [GHz]")
+#plt.ylabel("$Z_z$ [$\Omega$]")
+plt.figure(4)
+plt.legend(loc=0)
+plt.xlabel("f [GHz]")
+#plt.ylabel("$Z_z$ [$\Omega$]")
+
+
+plt.figure(5)
 plt.legend()
 plt.xlabel("f [GHz]")
 plt.ylabel("$|Z_z|$ [$\Omega$]")
 
-plt.figure(4)
+plt.figure(6)
 plt.legend()
 plt.xlabel("s [m]")
 plt.ylabel("$V_z$ [V/pC]")
 
-plt.figure(5)
+plt.figure(7)
 plt.legend()
 plt.xlabel("s [m]")
 plt.ylabel("$V_z$ [V/pC]")
 
-
-# plt.figure(6)
+# plt.figure(8)
 # plt.legend()
 # plt.xlabel("f [GHz]")
 # plt.ylabel("Z [$\Omega$]/($f/f_{rev}$)")
