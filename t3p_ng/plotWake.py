@@ -209,66 +209,79 @@ plt.figure(1)
 plt.legend()
 plt.xlabel("s [m]")
 plt.ylabel("$V_z$ [V/pC]")
+plt.title("Longitudinal wake")
 
 plt.figure(2)
 plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 plt.ylabel("$Z_z$ [$\Omega$]")
+plt.title("Longitudinal wake spectrum (re/im)")
 
 plt.figure(3)
 plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 #plt.ylabel("$Z_z$ [$\Omega$]")
+plt.title("Longitudinal voltage spectrum (re/im)")
+
 plt.figure(4)
 plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 #plt.ylabel("$Z_z$ [$\Omega$]")
-
+plt.title("Longitudinal bunch spectrum (re/im)")
 
 plt.figure(5)
 plt.legend()
 plt.xlabel("f [GHz]")
 plt.ylabel("$|Z_z|$ [$\Omega$]")
+plt.title("Longitudinal wake spectrum (abs)")
 
 plt.figure(6)
 plt.legend()
 plt.xlabel("s [m]")
 plt.ylabel("$V_z$ [V/pC]")
+plt.title("Longitudinal wake envelope")
 
 plt.figure(7)
 plt.legend()
 plt.xlabel("s [m]")
 plt.ylabel("$V_z$ [V/pC]")
+plt.title("Longitudinal wake (log y)")
 
 # plt.figure(8)
 # plt.legend()
 # plt.xlabel("f [GHz]")
 # plt.ylabel("Z [$\Omega$]/($f/f_{rev}$)")
+# plt.title("Normalized spectrum")
 
 if doTrans:
     plt.figure(11)
     plt.legend()
     plt.xlabel("s [m]")
     plt.ylabel("$V_x$ [V/pC]")
-    
+    plt.title("Transverse wake")
+  
     plt.figure(12)
     plt.legend()
     plt.xlabel("f [GHz]")
     plt.ylabel("$Z_x$ [$\Omega$]")
-    
+    plt.title("Transverse wake spectrum (re/im)")
+        
     plt.figure(13)
     plt.legend()
     plt.xlabel("f [GHz]")
     plt.ylabel("$|Z_x|$ [$\Omega$]")
+    plt.title("Transverse wake spectrum (abs)")
     
     plt.figure(14)
     plt.legend()
     plt.xlabel("s [m]")
     plt.ylabel("$V_x$ [V/pC]")
-
+    plt.title("Transverse wake spectrum (abs)")
+    
     plt.figure(15)
     plt.legend()
     plt.xlabel("s [m]")
     plt.ylabel("$V_x$ [V/pC]")
+    plt.title("Transverse wake envelope (log y)")
 
 plt.show()
