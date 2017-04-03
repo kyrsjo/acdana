@@ -14,7 +14,7 @@ doTrans     = False
 doTransSym  = False
 doTransDouble = False
 
-wakes       = []
+wakefiles   = []
 imps        = []
 envs        = []
 wakes_trans = []
@@ -26,10 +26,12 @@ scaleFactor = []
 
 window = None
 
+doExport = False
+
 for arg in sys.argv[1:]:
     if arg.startswith("--trans"):
         doTrans=True
-        if not len(wakes)==0:
+        if not len(wakefiles)==0:
             print "'--trans{sym|double}' keyword should come first"
             exit(1)
         if arg == "--transsym":
@@ -65,26 +67,30 @@ for arg in sys.argv[1:]:
             print "Cannot recognize window name"
             exit(1)
         continue
+    elif arg.startswith("--export"):
+        doExport = True
+        continue
+    
     args = arg.split('--')
     if len(args) == 1:
-        wakes.append( loadWakeFile(arg) )
+        wakefiles.append( WakeFile(arg) )
         names.append( arg )
         maxS.append(None)
         scaleFactor.append(None)
     elif len(args) == 2:
-        wakes.append( loadWakeFile(args[0]) )
+        wakefiels.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(None)
         scaleFactor.append(None)
     elif len(args) == 3:
-        wakes.append( loadWakeFile(args[0]) )
+        wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
         for w in wakes[-1]:
             w.cropToS(maxS[-1])
         scaleFactor.append(None)
     elif len(args) == 4:
-        wakes.append( loadWakeFile(args[0]) )
+        wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
         for w in wakes[-1]:
@@ -98,17 +104,18 @@ for arg in sys.argv[1:]:
     
     imp = []
     env = []
-    for w in wakes[-1]:
+    print wakefiles
+    for w in wakefiles[-1].wakes:
         imp.append(ImpedanceSpectrum(w,window))
         env.append(Envelope(w))
     imps.append(imp)
     envs.append(env)
     
     if doTransDouble:
-        assert len(wakes[-1]) == 2, wakes[-1]
+        assert len(wakefiles[-1].wakes) == 2
         #Calculate the "radial" wake from r1 to r2
-        w1 = wakes[-1][0]
-        w2 = wakes[-1][1]
+        w1 = wakefiles[-1].wakes[0]
+        w2 = wakefiles[-1].wakes[1]
         assert len(w1.s)==len(w2.s)
         dx=w2.x-w1.x
         dy=w2.y-w1.y
@@ -162,19 +169,19 @@ for arg in sys.argv[1:]:
         imps_trans.append(None)
         envs_trans.append(None)
         
-if len(wakes) == 0:
+if len(wakefiles) == 0:
     print "Please provide at least one wakefile"
     exit (1)
 
-for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,envs_trans):
+for (w,i,e,n, wt,it,et) in zip(wakefiles,imps,envs,names, wakes_trans,imps_trans,envs_trans):
     print "Plotting '"+n+"'"
 
     #Longitudinal wake
     plt.figure(1)
-    wl = plt.plot(w[0].s, w[0].V/w[0].Q, label=n, ls='-')
+    wl = plt.plot(w.s, w.wakes[0].V/w.wakes[0].Q, label=n, ls='-')
     wlc = wl[0].get_color()
-    Iscale = max(w[0].V/w[0].Q)/max(w[0].I)
-    plt.plot(w[0].s, w[0].I*Iscale, ls='--',color=wlc)
+    Iscale = max(w.wakes[0].V/w.wakes[0].Q)/max(w.wakes[0].I)
+    plt.plot(w.s, w.wakes[0].I*Iscale, ls='--',color=wlc)
 
     #Longitudinal wake spectrum (re/im)
     plt.figure(2)
@@ -199,11 +206,11 @@ for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,env
 
     #Longitudinal wake envelope
     plt.figure(6)
-    plt.plot(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="-")
+    plt.plot(e[0].s,e[0].Venv/w.wakes[0].Q,label=n,color=wlc,ls="-")
 
     #Longitudinal wake (log y)
     plt.figure(7)
-    plt.semilogy(e[0].s,e[0].Venv/w[0].Q,label=n,color=wlc,ls="-")
+    plt.semilogy(e[0].s,e[0].Venv/w.wakes[0].Q,label=n,color=wlc,ls="-")
     
     #Normalized spectrum
     # plt.figure(8)
@@ -319,5 +326,10 @@ if doTrans:
     plt.xlabel("s [m]")
     plt.ylabel("$V_x$ [V/pC]")
     plt.title("Transverse wake envelope (log y)")
+
+if doExport:
+    assert len(wakefiles)==1, "Please use only one single wake file for exporting"
+    print wakefiles[0]
+    print "Exporting"
 
 plt.show()

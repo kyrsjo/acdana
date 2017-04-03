@@ -166,62 +166,65 @@ class Envelope:
                 self.s_peaksDn.append(self.s[i])
                 self.V_peaksDn.append(self.wake.V[i])
         self.Venv = ( np.interp(self.s, self.s_peaksUp, self.V_peaksUp) - np.interp(self.s, self.s_peaksDn, self.V_peaksDn) ) / 2.0
-        
-        
-def loadWakeFile(fname):
-    wakes = []
-    
-    #loadStrings = ""
+
+class WakeFile:
     s = []
-    V = []
-    I = []
-    x = None
-    y = None
-    
-    wfile = open(fname,'r')
-    
-    inCommentBlock = True
-    commentBlockLineCounter = 0
-    for l in wfile.xreadlines():
-        if l[0] == '#':
-            if not inCommentBlock:
-                inCommentBlock = True
-                commentBlockLineCounter = 0
-                
-                if len(s) >= 0:
-                    assert len(s)==len(V) and len(s)==len(I)
-                    #Add the previous wake to the list
-                    wakes.append(Wake(s,V,I,x,y))
-                    #reset the reader
-                    s = []
-                    V = []
-                    I = []
-                    x = None
-                    y = None
-                
-            commentBlockLineCounter = commentBlockLineCounter + 1
-                
-            if commentBlockLineCounter == 2:
-                (x,y) = map(float,l[2:-2].split(','))
-                print "reading point x=%g, y=%g"%(x,y)
-        else:
-            if inCommentBlock:
-                assert commentBlockLineCounter == 4 or commentBlockLineCounter == 3
-                inCommentBlock = False
-                commentBlockLineCounter=0
-                
-            # Slow and ineff, but whatevs.
-            sVI = l.split()
-            s.append(float(sVI[0]))
-            V.append(float(sVI[1]))
-            I.append(float(sVI[2]))
+    fname = []
+    wakes = []
+    def __init__(self,fname):
+        self.fname=fname
+        self.wakes = []
+        
+        #Temps for loading each wake
+        s = []
+        V = []
+        I = []
+        x = None
+        y = None
 
-    wfile.close()
-    #Add the last wake to the list
-    wakes.append(Wake(s,V,I,x,y))
-    return wakes
+        wfile = open(fname,'r')
 
+        inCommentBlock = True
+        commentBlockLineCounter = 0
+        for l in wfile.xreadlines():
+            if l[0] == '#':
+                if not inCommentBlock:
+                    inCommentBlock = True
+                    commentBlockLineCounter = 0
 
-# import sys
-# wakes = loadWakeFile(sys.argv[1])
-# print wakes
+                    if len(s) >= 0:
+                        assert len(s)==len(V) and len(s)==len(I)
+                        #Add the previous wake to the list
+                        self.wakes.append(Wake(s,V,I,x,y))
+                        #reset the reader
+                        s = []
+                        V = []
+                        I = []
+                        x = None
+                        y = None
+
+                commentBlockLineCounter = commentBlockLineCounter + 1
+
+                if commentBlockLineCounter == 2:
+                    (x,y) = map(float,l[2:-2].split(','))
+                    print "reading point x=%g, y=%g"%(x,y)
+            else:
+                if inCommentBlock:
+                    assert commentBlockLineCounter == 4 or commentBlockLineCounter == 3
+                    inCommentBlock = False
+                    commentBlockLineCounter=0
+
+                # Slow and ineff, but whatevs.
+                sVI = l.split()
+                s.append(float(sVI[0]))
+                V.append(float(sVI[1]))
+                I.append(float(sVI[2]))
+
+        wfile.close()
+        #Add the last wake to the list
+        self.wakes.append(Wake(s,V,I,x,y))
+
+        self.s = self.wakes[0].s
+        #Check that s is the same every time
+        for w in self.wakes:
+            assert np.array_equal(w.s,self.s)
