@@ -182,20 +182,23 @@ def loadWakeFile(fname):
     
     inCommentBlock = True
     commentBlockLineCounter = 0
-    for l in wfile:
+    for l in wfile.xreadlines():
         if l[0] == '#':
             if not inCommentBlock:
-                if commentBlockLineCounter < 0:
+                inCommentBlock = True
+                commentBlockLineCounter = 0
+                
+                if len(s) >= 0:
+                    assert len(s)==len(V) and len(s)==len(I)
+                    #Add the previous wake to the list
                     wakes.append(Wake(s,V,I,x,y))
+                    #reset the reader
                     s = []
                     V = []
                     I = []
                     x = None
                     y = None
-
-                inCommentBlock = True
-                commentBlockLineCounter = 0
-            
+                
             commentBlockLineCounter = commentBlockLineCounter + 1
                 
             if commentBlockLineCounter == 2:
@@ -205,7 +208,8 @@ def loadWakeFile(fname):
             if inCommentBlock:
                 assert commentBlockLineCounter == 4 or commentBlockLineCounter == 3
                 inCommentBlock = False
-    
+                commentBlockLineCounter=0
+                
             # Slow and ineff, but whatevs.
             sVI = l.split()
             s.append(float(sVI[0]))
@@ -220,7 +224,7 @@ def loadWakeFile(fname):
     x = None
     y = None
     wfile.close()
-    
+    print "returning", wakes, wakes[-1].x
     return wakes
 
 
