@@ -329,7 +329,13 @@ if doTrans:
 
 if doExport:
     assert len(wakefiles)==1, "Please use only one single wake file for exporting"
-    print wakefiles[0]
-    print "Exporting"
-
+    if doTrans:
+        ofname = wakefiles[0].fname + "-transwake"
+        print "Exporting '"+ ofname + "'"
+        ofile = open(ofname,'w')
+        ofile.write("# s[m] Wr[V/pC]\n")
+        for (s,V) in zip(wt[0].s, wt[0].V/wt[0].Q):
+            ofile.write("%f %f\n" % (s,-V))
+        ofile.close()
+        
 plt.show()
