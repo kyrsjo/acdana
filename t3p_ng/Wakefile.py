@@ -215,16 +215,10 @@ def loadWakeFile(fname):
             s.append(float(sVI[0]))
             V.append(float(sVI[1]))
             I.append(float(sVI[2]))
-            
-    #last one
-    wakes.append(Wake(s,V,I,x,y))
-    s = []
-    V = []
-    I = []
-    x = None
-    y = None
+
     wfile.close()
-    print "returning", wakes, wakes[-1].x
+    #Add the last wake to the list
+    wakes.append(Wake(s,V,I,x,y))
     return wakes
 
 
