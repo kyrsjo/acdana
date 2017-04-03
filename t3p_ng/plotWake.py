@@ -10,7 +10,9 @@ print 'Usage:'
 print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans) (--window={rect|rectN|tri|welch|hanning|hamming|blackmanHarris|flatTop}) etc.'
 print "Note that the windows affect the wakes calculated AFTER it's specification, or until the the next window. The default window is 'rect' (aka 'no window')"
 
-doTrans = False
+doTrans     = False
+doTransSym  = False
+doTransDouble = False
 
 wakes       = []
 imps        = []
@@ -25,10 +27,17 @@ scaleFactor = []
 window = None
 
 for arg in sys.argv[1:]:
-    if arg=="--trans":
+    if arg.startswith("--trans"):
         doTrans=True
         if not len(wakes)==0:
-            print "'--trans' keyword should come first"
+            print "'--trans{sym|double}' keyword should come first"
+            exit(1)
+        if arg == "--transsym":
+            doTransSym=True
+        elif arg == "--transdouble":
+            doTransDouble=True
+        else:
+            print "Expected either transsym or transdouble"
             exit(1)
         continue
     elif arg.startswith("--window="):
@@ -94,8 +103,35 @@ for arg in sys.argv[1:]:
         env.append(Envelope(w))
     imps.append(imp)
     envs.append(env)
+    
+    if doTransDouble:
+        assert len(wakes[-1]) == 2, wakes[-1]
+        #Calculate the "radial" wake from r1 to r2
+        w1 = wakes[-1][0]
+        w2 = wakes[-1][1]
+        assert len(w1.s)==len(w2.s)
+        dx=w2.x-w1.x
+        dy=w2.y-w1.y
+        dr = np.sqrt(dx**2 + dy**2)
 
-    if doTrans:
+        print "Calculating transverse wakes along vector with angle=", np.arctan2(dy,dx)*180.0/np.pi, "degrees, dr=",dr,"[m]"
+
+        dVzDx = np.zeros_like(w1.s)
+        V_x = np.zeros_like(w1.s)
+        for si in xrange(1,len(w1.s)):
+            dVzDx[si] = (w2.V[si]-w1.V[si])/dr
+            if si%2==0:
+                V_x[si] = (w1.s[si]-w1.s[si-2])*(dVzDx[si-2]+4*dVzDx[si-1]+dVzDx[si])/6.0 + V_x[si-2]
+            else:
+                V_x[si] = 0.5*(w1.s[si]-w1.s[si-1])*(dVzDx[si-1] + dVzDx[si]) + V_x[si-1]
+        wx = (Wake(w1.s,V_x,w1.I,w1.x+dx/2,w2.y+dy/2))
+        
+        wakes_trans.append((wx,))
+        imps_trans.append((ImpedanceSpectrum(wx,window),))
+        envs_trans.append((Envelope(wx),))
+
+        
+    elif doTransSym:
         vx  = []
         imp = []
         env = []
@@ -184,7 +220,7 @@ for (w,i,e,n, wt,it,et) in zip(wakes,imps,envs,names, wakes_trans,imps_trans,env
         plt.figure(12)
         plt.plot(it[0].f[:i[0].goodIdx]/1e9, np.real(it[0].Z[:i[0].goodIdx]), color=wlc, ls='-', label=n)
         plt.plot(it[0].f[:i[0].goodIdx]/1e9, np.imag(it[0].Z[:i[0].goodIdx]), color=wlc, ls='--')
-
+        
         #Transverse wake spectrum (abs)
         plt.figure(13)
         plt.plot(it[0].f[:i[0].goodIdx]/1e9, np.abs(it[0].Z[:i[0].goodIdx]), label=n,color=wlc,ls="-")
