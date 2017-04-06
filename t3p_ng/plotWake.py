@@ -7,7 +7,7 @@ import sys
 from Wakefile import *
 
 print 'Usage:'
-print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans) (--window={rect|rectN|tri|welch|hanning|hamming|blackmanHarris|flatTop}) etc.'
+print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans{sym|double}) (--window={rect|rectN|tri|welch|hanning|hamming|blackmanHarris|flatTop}) etc.'
 print "Note that the windows affect the wakes calculated AFTER it's specification, or until the the next window. The default window is 'rect' (aka 'no window')"
 
 doTrans     = False
@@ -319,7 +319,7 @@ if doTrans:
     plt.legend()
     plt.xlabel("s [m]")
     plt.ylabel("$V_x$ [V/pC]")
-    plt.title("Transverse wake spectrum (abs)")
+    plt.title("Transverse wake envelope")
     
     plt.figure(15)
     plt.legend()
