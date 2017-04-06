@@ -78,7 +78,7 @@ for arg in sys.argv[1:]:
         maxS.append(None)
         scaleFactor.append(None)
     elif len(args) == 2:
-        wakefiels.append( WakeFile(args[0]) )
+        wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(None)
         scaleFactor.append(None)
@@ -86,17 +86,15 @@ for arg in sys.argv[1:]:
         wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
-        for w in wakes[-1]:
-            w.cropToS(maxS[-1])
+        wakefiles[-1].cropToS(maxS)
         scaleFactor.append(None)
     elif len(args) == 4:
         wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
-        for w in wakes[-1]:
-            w.cropToS(maxS[-1])
+        wakefiles[-1].cropToS(maxS)
         scaleFactor.append(float(args[3]))
-        for w in wakes[-1]:
+        for w in wakefiles[-1].wakes:
             w.scaleV(scaleFactor[-1])
     else:
         print "ERROR: Unexpected number of arguments (", len(args), ") when splitting '"+arg+"' by '--'. PEBKAC?"
@@ -258,19 +256,19 @@ plt.figure(2)
 plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 plt.ylabel("$Z_z$ [$\Omega$]")
-plt.title("Longitudinal wake spectrum (re/im)")
+plt.title("Longitudinal wake spectrum ( re (-) / im (--) )")
 
 plt.figure(3)
 plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 #plt.ylabel("$Z_z$ [$\Omega$]")
-plt.title("Longitudinal voltage spectrum (re/im)")
+plt.title("Longitudinal voltage spectrum ( re (-) / im (--)")
 
 plt.figure(4)
 plt.legend(loc=0)
 plt.xlabel("f [GHz]")
 #plt.ylabel("$Z_z$ [$\Omega$]")
-plt.title("Longitudinal bunch spectrum (re/im)")
+plt.title("Longitudinal bunch spectrum ( re (-) / im (--)")
 
 plt.figure(5)
 plt.legend()
@@ -307,7 +305,7 @@ if doTrans:
     plt.legend()
     plt.xlabel("f [GHz]")
     plt.ylabel("$Z_x$ [$\Omega$]")
-    plt.title("Transverse wake spectrum (re/im)")
+    plt.title("Transverse wake spectrum (re (-) / im (--)")
         
     plt.figure(13)
     plt.legend()

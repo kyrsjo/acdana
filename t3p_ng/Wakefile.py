@@ -228,3 +228,11 @@ class WakeFile:
         #Check that s is the same every time
         for w in self.wakes:
             assert np.array_equal(w.s,self.s)
+    def cropToS(self,maxS):
+        for w in self.wakes:
+            w.cropToS(maxS)
+
+        self.s = self.wakes[0].s
+        #Check that s is the same every time
+        for w in self.wakes:
+            assert np.array_equal(w.s,self.s)
