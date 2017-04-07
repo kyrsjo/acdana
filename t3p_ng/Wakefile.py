@@ -172,6 +172,7 @@ class WakeFile:
     fname = []
     wakes = []
     def __init__(self,fname):
+        print "WakeFile.__init__ reading '"+fname+"'"
         self.fname=fname
         self.wakes = []
         

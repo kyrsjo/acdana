@@ -29,6 +29,7 @@ window = None
 doExport = False
 
 for arg in sys.argv[1:]:
+    print
     if arg.startswith("--trans"):
         doTrans=True
         if not len(wakefiles)==0:
@@ -86,13 +87,13 @@ for arg in sys.argv[1:]:
         wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
-        wakefiles[-1].cropToS(maxS)
+        wakefiles[-1].cropToS(maxS[-1])
         scaleFactor.append(None)
     elif len(args) == 4:
         wakefiles.append( WakeFile(args[0]) )
         names.append( args[1] )
         maxS.append(float(args[2]))
-        wakefiles[-1].cropToS(maxS)
+        wakefiles[-1].cropToS(maxS[-1])
         scaleFactor.append(float(args[3]))
         for w in wakefiles[-1].wakes:
             w.scaleV(scaleFactor[-1])
