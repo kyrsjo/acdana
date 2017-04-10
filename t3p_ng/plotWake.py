@@ -3,8 +3,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 
 from Wakefile import *
+
+DEFAULTWAKE="wakefield_whole.out"
 
 print 'Usage:'
 print 'plotWake.py wakefile1(--name1(--cutlen1(--scaleFactor1))) wakefile2(--name2(--cutlen2(--scaleFactor2))) (--trans{sym|double}) (--window={rect|rectN|tri|welch|hanning|hamming|blackmanHarris|flatTop}) etc.'
@@ -74,23 +77,35 @@ for arg in sys.argv[1:]:
     
     args = arg.split('--')
     if len(args) == 1:
-        wakefiles.append( WakeFile(arg) )
+        if not os.path.isdir(arg):
+            wakefiles.append( WakeFile(arg) )
+        else:
+            wakefiles.append( WakeFile(os.path.join(arg,"OUTPUT",DEFAULTWAKE)) )
         names.append( arg )
         maxS.append(None)
         scaleFactor.append(None)
     elif len(args) == 2:
-        wakefiles.append( WakeFile(args[0]) )
+        if not os.path.isdir(args[0]):
+            wakefiles.append( WakeFile(args[0]) )
+        else:
+            wakefiles.append( WakeFile(os.path.join(args[0],"OUTPUT",DEFAULTWAKE)) )
         names.append( args[1] )
         maxS.append(None)
         scaleFactor.append(None)
     elif len(args) == 3:
-        wakefiles.append( WakeFile(args[0]) )
+        if not os.path.isdir(args[0]):
+            wakefiles.append( WakeFile(args[0]) )
+        else:
+            wakefiles.append( WakeFile(os.path.join(args[0],"OUTPUT",DEFAULTWAKE)) )
         names.append( args[1] )
         maxS.append(float(args[2]))
         wakefiles[-1].cropToS(maxS[-1])
         scaleFactor.append(None)
     elif len(args) == 4:
-        wakefiles.append( WakeFile(args[0]) )
+        if not os.path.isdir(args[0]):
+            wakefiles.append( WakeFile(arg[0]) )
+        else:
+            wakefiles.append( WakeFile(os.path.join(args[0],"OUTPUT",DEFAULTWAKE)) )
         names.append( args[1] )
         maxS.append(float(args[2]))
         wakefiles[-1].cropToS(maxS[-1])
