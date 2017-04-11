@@ -61,7 +61,7 @@ class ImpedanceSpectrum:
     
     c = 299792458 #[m/s]
 
-    def __init__(self, wake, windowFunc=None):
+    def __init__(self, wake, windowFunc=None, isTrans=False):
         self.wake = wake
 
         self.t = self.wake.s/self.c
@@ -90,6 +90,9 @@ class ImpedanceSpectrum:
                 break
 
         self.Z = self.V_FFT/self.I_FFT
+        if isTrans:
+            #Convention according to B. Zotter
+            self.Z *=(-1j)
 
     # Window functions from
     # https://en.wikipedia.org/wiki/Window_function

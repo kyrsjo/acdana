@@ -103,7 +103,7 @@ for arg in sys.argv[1:]:
         scaleFactor.append(None)
     elif len(args) == 4:
         if not os.path.isdir(args[0]):
-            wakefiles.append( WakeFile(arg[0]) )
+            wakefiles.append( WakeFile(args[0]) )
         else:
             wakefiles.append( WakeFile(os.path.join(args[0],"OUTPUT",DEFAULTWAKE)) )
         names.append( args[1] )
@@ -148,7 +148,7 @@ for arg in sys.argv[1:]:
         wx = (Wake(w1.s,V_x,w1.I,w1.x+dx/2,w2.y+dy/2))
         
         wakes_trans.append((wx,))
-        imps_trans.append((ImpedanceSpectrum(wx,window),))
+        imps_trans.append((ImpedanceSpectrum(wx,window,True),))
         envs_trans.append((Envelope(wx),))
 
         
@@ -175,7 +175,7 @@ for arg in sys.argv[1:]:
         wx = (Wake(s,V_x,wl.I,0.0,wl.y))
         
         wakes_trans.append((wx,))
-        imps_trans.append((ImpedanceSpectrum(wx,window),))
+        imps_trans.append((ImpedanceSpectrum(wx,window,True),))
         envs_trans.append((Envelope(wx),))
         
     else:
@@ -320,13 +320,15 @@ if doTrans:
     plt.figure(12)
     plt.legend()
     plt.xlabel("f [GHz]")
+    #plt.ylabel("$Z_x$ [$\Omega/mm$]")
     plt.ylabel("$Z_x$ [$\Omega$]")
     plt.title("Transverse wake spectrum (re (-) / im (--)")
         
     plt.figure(13)
     plt.legend()
     plt.xlabel("f [GHz]")
-    plt.ylabel("$|Z_x|$ [$\Omega$]")
+    #plt.ylabel("$|Z_x|$ [$\Omega/mm$]")
+    plt.ylabel("$|Z_x|$ [$\Omega]")
     plt.title("Transverse wake spectrum (abs)")
     
     plt.figure(14)
