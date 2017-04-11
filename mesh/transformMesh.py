@@ -79,19 +79,71 @@ def scaleR(z,r, z0,z1):
     S = R/r
     return S
 #Transformation 2: Shift y
-def shiftY(z):
+def shiftY(z,r):
     if z < z1_up:
-        #return (z-z0_up) * y_shift/(z1_up-z0_up)
-        #Linearly interpolate between (z0_up,0) and (z1_up,y_shift)
-        return (1-(z-z0_up)/(z1_up-z0_up))*0 + (z-z0_up)/(z1_up-z0_up)*y_shift
-    elif z>z1_dn:
-        #return (z-z1_dn) * y_shift/(z1_up-z0_up) - y_shift
-        #Linearly interpolate between (z1_dn,-y_shift) and (z0_dn,0)
-        return (1-(z-z1_dn)/(z0_dn-z1_dn))*(-y_shift) + (z-z1_dn)/(z0_dn-z1_dn)*0
-    else:
-        #Linearly interpolate between (z1_up,y_shift) and (z1_dn,-y_shift)
-        return (1-(z-z1_up)/(z1_dn-z1_up))*y_shift + ((z-z1_up)/(z1_dn-z1_up))*(-y_shift)
+        z0 = z0_up
+        z1 = z1_up
 
+        #Inner boundary of scaled region
+        r_inner = ri
+        #Outer boundary of scaled region -- a function of z
+        #Linearly interpolate from (r0,z0) to (r1,z1)
+        r_outer = (1-(z-z0)/(z1-z0))*r0 + ((z-z0)/(z1-z0))*r1
+        
+        assert r >= 0
+        if r < r_inner:
+            yshift_scale = 0
+        elif r < r_outer:
+            #Linearly interpolate between (r_inner,0) and (r_outer,1.0)
+            yshift_scale = (1-(r-r_inner)/(r_outer-r_inner))*0.0 + ((r-r_inner)/(r_outer-r_inner))*1.0
+        else:
+            yshift_scale = 1.0
+            
+        #Linearly interpolate between (z0_up,0) and (z1_up,y_shift)
+        yshift = (1-(z-z0_up)/(z1_up-z0_up))*0 + (z-z0_up)/(z1_up-z0_up)*y_shift
+
+        return yshift_scale * yshift
+    elif z>z1_dn:
+        z0 = z0_dn
+        z1 = z1_dn
+        
+        #Inner boundary of scaled region
+        r_inner = ri
+        #Outer boundary of scaled region -- a function of z
+        #Linearly interpolate from (r0,z0) to (r1,z1)
+        r_outer = (1-(z-z0)/(z1-z0))*r0 + ((z-z0)/(z1-z0))*r1
+
+        assert r >= 0
+        if r < r_inner:
+            yshift_scale = 0
+        elif r < r_outer:
+            #Linearly interpolate between (r_inner,0) and (r_outer,1.0)
+            yshift_scale = (1-(r-r_inner)/(r_outer-r_inner))*0.0 + ((r-r_inner)/(r_outer-r_inner))*1.0
+        else:
+            yshift_scale = 1.0
+        
+        #Linearly interpolate between (z1_dn,-y_shift) and (z0_dn,0)
+        yshift = (1-(z-z1_dn)/(z0_dn-z1_dn))*(-y_shift) + (z-z1_dn)/(z0_dn-z1_dn)*0
+        return yshift_scale * yshift
+    else:
+
+        #Inner boundary of scaled region
+        r_inner = ri
+        #Outer boundary of scaled region
+        r_outer = r1
+
+        assert r >= 0
+        if r < r_inner:
+            yshift_scale = 0
+        elif r < r_outer:
+            #Linearly interpolate between (r_inner,0) and (r_outer,1.0)
+            yshift_scale = (1-(r-r_inner)/(r_outer-r_inner))*0.0 + ((r-r_inner)/(r_outer-r_inner))*1.0
+        else:
+            yshift_scale = 1.0
+        
+        #Linearly interpolate between (z1_up,y_shift) and (z1_dn,-y_shift)
+        yshift = (1-(z-z1_up)/(z1_dn-z1_up))*y_shift + ((z-z1_up)/(z1_dn-z1_up))*(-y_shift)
+        return yshift_scale * yshift
 #Loop over the coordinates, apply transformation as needed
 ncoords = len(mfile_in.dimensions["ncoords"])
 
@@ -121,9 +173,10 @@ for i in xrange(ncoords):
         x *= S
         y *= S
     
-    y += shiftY(z)
-        
-        
+    r = np.sqrt(x**2+y**2)    
+    y += shiftY(z,r)
+    
+    
     #r = np.sqrt(x**2+y**2)
     #Z_post[i] = z
     #R_post[i] = r
