@@ -8,11 +8,12 @@ import numpy as np
 #import matplotlib.pyplot as plt
 
 if len(sys.argv) != 3:
-    print "Usage: findBadBC.py filename_in.ncdf filename_out"
+    print "Usage: transformMesh.py filename_in.ncdf filename_out"
     exit(1)
 mfile_in_name  = sys.argv[1]
 mfile_out_name = sys.argv[2]
 
+assert mfile_in_name != mfile_out_name
 
 #Get the root group in the file
 mfile_in=ncdf.Dataset(mfile_in_name,'r')
@@ -28,8 +29,8 @@ for d in mfile_in.dimensions:
 
 for v in mfile_in.variables:
     print "Copying data table '"+v+"', type =",mfile_in.variables[v].datatype, ", dimensions =",mfile_in.variables[v].dimensions
-    print mfile_in.variables[v].datatype
-    print mfile_in.variables[v].dimensions
+    #print mfile_in.variables[v].datatype
+    #print mfile_in.variables[v].dimensions
     mfile_out.createVariable(v,mfile_in.variables[v].datatype,mfile_in.variables[v].dimensions)
     if v == "coords":
         #Do some transformation on this one, so don't copy the data just yet...
@@ -58,6 +59,18 @@ z1_up =  -26.86e-3    # Transition to central region
 
 z0_dn = 442.607799e-3 # End of beam pipe
 z1_dn = 142.607799e-3 # Transition to central region
+#############
+print "Parameters:"
+print "ri      =", ri, "[m]"
+print "r0      =", r0, "[m]"
+print "r1      =", r1, "[m]"
+print "y_shift =", r0, "[m]"
+print "z0_up   =", z0_up, "[m]"
+print "z1_up   =", z0_up, "[m]"
+print "z0_dn   =", z1_dn, "[m]"
+print "z1_dn   =", z1_dn, "[m]"
+print
+
 ###########################################################
 
 #Transformation 1: Narrower at the pipe ends
@@ -99,8 +112,10 @@ coords_in = mfile_in.variables["coords"]
 coords_out = mfile_out.variables["coords"]
 
 tenPercent = ncoords / 10
+onePercent = ncoords / 100
 for i in xrange(ncoords):
-    if i % tenPercent == 0:
+    #if i % tenPercent == 0:
+    if i % onePercent == 0:
         print (i*100.0/ncoords),"%"
         
     x,y,z = coords_in[i,:]
