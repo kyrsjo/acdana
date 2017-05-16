@@ -16,7 +16,7 @@ class Wake:
 
     def __init__(self,s,V,I,x,y):
         self.s = np.asarray(s)
-        self.V = -1.0*np.asarray(V) #To conform to convention W(0+) > 0 -- ACE3P uses inverted definition.
+        self.V = np.asarray(V)
         self.I = np.asarray(I)
         self.x = x
         self.y = y
@@ -72,6 +72,9 @@ class ImpedanceSpectrum:
         
         self.V_FFT = self.t[-1]*np.fft.rfft(self.wake.V*window)/(len(self.wake.V)-1)
         self.I_FFT = self.c * self.t[-1]*np.fft.rfft(self.wake.I*window)/(len(self.wake.I)-1)
+
+        #self.V_FFT = self.V_FFT.conjugate()
+        #self.I_FFT = self.I_FFT.conjugate()
         
         self.f = np.fft.fftfreq(self.t.size, d=self.t[1]-self.t[0])
 
@@ -91,8 +94,8 @@ class ImpedanceSpectrum:
 
         self.Z = self.V_FFT/self.I_FFT
         if isTrans:
-            #Convention according to B. Zotter
-            self.Z *=(-1j)
+            #Convention for the transverse wake, according to B. Zotter
+            self.Z *=(1j)
 
     # Window functions from
     # https://en.wikipedia.org/wiki/Window_function
@@ -228,6 +231,8 @@ class WakeFile:
         
         #Add the last wake to the list
         self.wakes.append(Wake(s,V,I,x,y))
+        #To conform to convention W_z(0+) > 0 -- ACE3P uses inverted definition.
+        self.wakes[-1].scaleV(-1)
 
         self.s = self.wakes[0].s
         #Check that s is the same every time

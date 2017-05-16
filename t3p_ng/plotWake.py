@@ -135,7 +135,7 @@ for arg in sys.argv[1:]:
         dy=w2.y-w1.y
         dr = np.sqrt(dx**2 + dy**2)
 
-        print "Calculating transverse wakes along vector with angle=", np.arctan2(dy,dx)*180.0/np.pi, "degrees, dr=",dr,"[m]"
+        print "Calculating transverse wakes along vector (dx,dy) = (",dx,",",dy,") [m] corresponding to angle=", np.arctan2(dy,dx)*180.0/np.pi, "degrees, dr=",dr,"[m]"
 
         dVzDx = np.zeros_like(w1.s)
         V_x = np.zeros_like(w1.s)
@@ -159,11 +159,14 @@ for arg in sys.argv[1:]:
 
         #Calculate transverse x-component, assuming single wake and antisymmetry around x=0
         # Code copied from old "TRANSSYM" mode
-        assert len(wakes[-1])==1
-        wl = wakes[-1][0]
+        assert len(wakefiles[-1].wakes)==1
+        wl = wakefiles[-1].wakes[0]
 
         dx = wl.x
         s  = wl.s
+
+        print "Calculating transverse wakes using midpoint symmetry, with dx =",dx,"[m]"
+        
         dVzDx = np.zeros_like(s)
         V_x = np.zeros_like(s)
         for si in xrange(1,len(s)):
@@ -236,7 +239,10 @@ for (w,i,e,n, wt,it,et) in zip(wakefiles,imps,envs,names, wakes_trans,imps_trans
         #Transverse wake
         plt.figure(11)
         plt.plot(wt[0].s, wt[0].V/wt[0].Q,label=n,ls="-")
+        Iscale = max(wt[0].V/wt[0].Q)/max(wt[0].I)
+        plt.plot(wt[0].s, wt[0].I*Iscale, ls='--',color=wlc)
 
+        
         #Transverse wake spectrum (re/im)
         plt.figure(12)
         plt.plot(it[0].f[:i[0].goodIdx]/1e9, np.real(it[0].Z[:i[0].goodIdx]), color=wlc, ls='-', label=n)
